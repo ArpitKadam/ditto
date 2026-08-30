@@ -2,6 +2,20 @@
 
 Append-only log of significant technical decisions, newest first.
 
+## 2026-08-31 — Task 2: fetch implementation choices
+
+- **Decision:** (a) Use stdlib `urllib` for the three arXiv endpoints (e-print, export API, /html) instead of the `arxiv` package or `requests`. (b) Flatten multi-file LaTeX with a small in-repo Python `\input`/`\include` resolver instead of `latexpand`. (c) Slug = bare arXiv id with `/` → `-` (old-style ids), or sanitized filename stem for local/PDF-URL inputs. (d) Network tests carry a `network` pytest marker and are deselected by default (`addopts = -m 'not network'`); run explicitly with `-m network`.
+- **Alternatives considered:** `arxiv` PyPI package (adds a dep + transitive `feedparser`/`requests` for three simple GETs); `requests` (a dep for what `urllib` does); `latexpand` (Perl — not present on Windows, adds a non-Python runtime dep); running network tests by default (flaky, slow, rate-limited in CI).
+- **Why:** Ponytail ladder — stdlib covers HTTP and gzip/tar; a ~20-line flattener covers the arXiv multi-file case without a Perl dependency. Marked network tests keep `uv run pytest` fast and offline-deterministic while still exercising live fetch on demand.
+- **Consequences:** `pipeline/fetch.py` depends only on `PyYAML` beyond stdlib. LaTeX flattening resolves paths against the compilation-root dir (TeX semantics) and is containment-checked against untrusted e-print content. Revisit `latexpand` only if a real paper's `\input` structure defeats the simple resolver.
+
+## 2026-08-31 — Task 2: hardening untrusted downloaded content (security)
+
+- **Decision:** Treat downloaded e-print tarballs, arXiv API XML, and rendered HTML as untrusted at the trust boundary. Concretely: tar unpack uses `extractall(filter="data")` (PEP 706) — which sets the real floor `requires-python = ">=3.11.5"`; LaTeX `\input`/`\include` targets are rejected unless they resolve inside the source tree; XML is refused if it contains a DTD (`<!DOCTYPE`/`<!ENTITY`) before parsing, guarding XXE/billion-laughs; HTML `<img>` assets are downloaded only over `http(s)` from an `arxiv.org` host, blocking `file://` local reads and internal-host SSRF.
+- **Alternatives considered:** Trusting arXiv content implicitly (arXiv is author-uploaded — a malicious paper is a realistic threat); `defusedxml` (an added dep; the DTD-reject guard covers the two relevant attacks for this single well-formed feed); leaving `requires-python = ">=3.11"` (allows 3.11.0–3.11.4 where the `filter` kwarg raises `TypeError`, silently disabling the tar guard).
+- **Why:** Found by `security-review` (path traversal, HIGH; `file://`/SSRF, MED) and `cavecrew-reviewer` (the 3.11.5 `filter` floor). Each is a real exploit path triggered by merely fetching a crafted arXiv id; each fix is a few lines with a regression test.
+- **Consequences:** Minimum Python is 3.11.5. Any future fetch path added must re-apply the boundary checks. Revisit `defusedxml` if the pipeline ever parses XML from more sources.
+
 ## 2026-08-31 — Test-paper selection and plugin name
 
 - **Decision:** Plugin name stays **ditto**. Test papers: (1) **LoRA** (arXiv 2106.09685), (2) **DDPM** (arXiv 2006.11239), (3) **Grokking** (arXiv 2201.02177) as the deliberately underspecified paper.

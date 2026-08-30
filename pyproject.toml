@@ -2,8 +2,10 @@
 name = "ditto"
 version = "0.1.0"
 description = "Claude Code plugin: turn a research paper into an explained, implemented, visualized, and reported reproduction"
-requires-python = ">=3.11"
-dependencies = []
+requires-python = ">=3.11.5"
+dependencies = [
+    "pyyaml>=6.0.3",
+]
 
 [dependency-groups]
 dev = ["pytest>=8"]
@@ -14,3 +16,5 @@ package = false
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["."]
+addopts = "-m 'not network'"
+markers = ["network: hits live arXiv; run explicitly with -m network"]

@@ -197,7 +197,7 @@ Status values: `pending | in-progress | done`. Update in place as work progresse
 
 ### Phase 1 — Ingestion pipeline (no skills yet; 60% of project value)
 
-**Task 2 — `pipeline/fetch.py` + `workspace.py`** · Status: pending
+**Task 2 — `pipeline/fetch.py` + `workspace.py`** · Status: done
 - **Goal:** Any input → populated `source/` + manifest.
 - **Do:** Accept arXiv ID, arXiv URL (abs/pdf/html), local PDF/tex/txt path, generic PDF URL. Resolution order per locked decision 1: try e-print tarball (untar, flatten multi-file LaTeX to one `.tex`), else HTML (save page + image assets), else PDF. Create the run workspace, write `manifest.yaml` with `source_kind`. Check for an official repo (arXiv abstract links / README mention) and record in a fetch metadata file for the IR.
 - **Accept:** All three test papers fetch via e-print with figures present in the tarball assets; a local-PDF fixture also produces a valid workspace; garbage input fails with an explicit error, not a stack trace.

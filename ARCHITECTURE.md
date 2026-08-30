@@ -27,19 +27,30 @@ ditto/
 ├── .claude-plugin/plugin.json   # plugin manifest
 ├── pipeline/                    # plain Python package; skills invoke, never reimplement
 │   ├── __init__.py
-│   ├── fetch.py                 # resolve input → download source (e-print / html / pdf / local)
-│   ├── extract.py               # source → paper.md + figures/ (+ pages/ for pdf)
-│   ├── ir_build.py              # scaffold ir.yaml skeleton for Claude to fill
-│   ├── ir_validate.py           # schema check + provenance lint + status coverage
-│   └── workspace.py             # run dir creation, manifest read/write
+│   ├── fetch.py                 # DONE: resolve input → download source (e-print / html / pdf / local)
+│   ├── extract.py               # stub: source → paper.md + figures/ (+ pages/ for pdf)
+│   ├── ir_build.py              # stub: scaffold ir.yaml skeleton for Claude to fill
+│   ├── ir_validate.py           # stub: schema check + provenance lint + status coverage
+│   └── workspace.py             # DONE: run dir creation, manifest read/write
 ├── tests/                       # pytest; fixtures = the three test papers
-├── pyproject.toml               # uv-managed, package = false
+├── pyproject.toml               # uv-managed, package = false, requires-python >=3.11.5
 └── runs/                        # gitignored; per-paper workspaces
 ```
 
 Pending (created by the task that first fills them): `skills/{ingest,explain,code,visualize,report}/`, `agents/{ir-auditor,implementation-reviewer,viz-reviewer}.md`, `templates/`.
 
-Pipeline modules are docstring-only stubs; Tasks 2–4 implement them.
+`extract.py`, `ir_build.py`, `ir_validate.py` are docstring-only stubs; Tasks 3–4 implement them.
+
+## Fetch pipeline (`pipeline/fetch.py`)
+
+`fetch(raw, runs_dir)` is the entry point (also a CLI: `python -m pipeline.fetch <input>`). Flow:
+
+1. `resolve_input(raw)` → `Resolved{kind, ...}`: `arxiv` (id or arXiv URL, new `1234.56789` and old `hep-th/9901001` id forms), `pdf_url` (direct `.pdf` link), or `local` (existing `.pdf`/`.tex`/`.txt`). Anything else raises `FetchError` — an explicit message, never a stack trace.
+2. Source acquisition, per the priority decision: arXiv → download `e-print/{id}`; if it is a tarball, `_extract_eprint` unpacks (`extractall(filter="data")`), finds the main `.tex` (`\documentclass` + `\begin{document}`), and writes `main.flattened.tex` via `flatten_latex`. If e-print serves a PDF (source withheld), fall back to `/html/{id}` (`_fetch_arxiv_html`), else save the PDF. `pdf_url`/`local` copy bytes into `source/`.
+3. `fetch_arxiv_metadata` (export API, Atom XML) fills `fetch_meta.yaml`: title, authors, year, abstract, and `official_repo_candidates` (github/gitlab URLs scraped from abstract+comment, sentence punctuation stripped).
+4. `workspace.new_manifest` + `write_manifest` record `source_kind` (`latex`/`html`/`pdf`) and the pending stage tracker.
+
+Trust-boundary invariants (all downloaded content is untrusted): LaTeX `\input`/`\include` cannot escape the source tree; XML with a DTD is refused; HTML image assets download only over `http(s)` from `arxiv.org`.
 
 ## Contract 1 — Run workspace
 
