@@ -1,0 +1,16 @@
+[project]
+name = "ditto"
+version = "0.1.0"
+description = "Claude Code plugin: turn a research paper into an explained, implemented, visualized, and reported reproduction"
+requires-python = ">=3.11"
+dependencies = []
+
+[dependency-groups]
+dev = ["pytest>=8"]
+
+[tool.uv]
+package = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
