@@ -89,9 +89,21 @@ in `impl/tests/` and run with:
 cd "<runs>/<slug>/impl" && uv run pytest tests/ -q
 ```
 
-### 6. Mark the manifest
+### 6. Implementation review — mandatory before any tier claim
 
-Only after the evidence exists:
+Spawn the `implementation-reviewer` agent (registered by this plugin; if
+unavailable, spawn a general read-only subagent and paste it the
+instructions from `${CLAUDE_PLUGIN_ROOT}/agents/implementation-reviewer.md`).
+Give it only the run directory path — no implementer context. Save its
+output verbatim to `impl/logs/review_<tier>.md`.
+
+Its verdict gates the tier: **any HIGH or MED finding blocks step 7** until
+fixed (then re-review) or explicitly accepted by the user (record the
+acceptance as a deviation entry). LOW/INFO findings are noted, not blocking.
+
+### 7. Mark the manifest
+
+Only after the evidence exists and the review verdict is PASS (or user-accepted):
 
 ```bash
 uv run --directory "${CLAUDE_PLUGIN_ROOT}" python -m pipeline.workspace mark "<runs>/<slug>" code status=done tier_reached=T0
@@ -104,7 +116,8 @@ what blocked the rest.
 ## Done means
 
 `impl/` package + passing tests + both configs + evidence files matching
-`tier_reached`; every assumption resolution and departure present in
-`implementation_notes.deviations`; manifest consistent. Report: tier
-target vs reached, deviation count with one-line list, and the exact
-commands to re-run the evidence.
+`tier_reached` + `impl/logs/review_<tier>.md` with a PASS verdict (or
+user-accepted findings recorded as deviations); every assumption resolution
+and departure present in `implementation_notes.deviations`; manifest
+consistent. Report: tier target vs reached, review verdict, deviation count
+with one-line list, and the exact commands to re-run the evidence.

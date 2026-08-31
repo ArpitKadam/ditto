@@ -30,7 +30,8 @@ ditto/
 │   ├── explain/                 # DONE: IR → explain.md walkthrough (+ references/explanation-template.md)
 │   └── code/                    # DONE: IR → tier-verified impl/ (+ references/{tiers,implementation-patterns,pytorch-patterns}.md)
 ├── agents/
-│   └── ir-auditor.md            # DONE: fresh-context provenance audit (read-only: Read/Grep/Glob)
+│   ├── ir-auditor.md            # DONE: fresh-context provenance audit (read-only: Read/Grep/Glob)
+│   └── implementation-reviewer.md  # DONE: fresh-context impl-vs-IR faithfulness gate (read-only)
 ├── pipeline/                    # plain Python package; skills invoke, never reimplement
 │   ├── __init__.py
 │   ├── fetch.py                 # DONE: resolve input → download source (e-print / html / pdf / local)
@@ -50,7 +51,9 @@ Pending (created by the task that first fills them): `skills/{visualize,report}/
 
 ## Code skill (`skills/code/SKILL.md`)
 
-`ditto:code` turns a validated IR into `runs/<slug>/impl/`: workflow = official-repo check (record-only) → declare `tier_target` in the manifest → implementation plan mapping components/equations to modules → smallest-first implementation with `config_paper.yaml` (faithful, src comments, RESOLVED markers) + `config_small.yaml` (minutes on CPU) → deviations appended to `implementation_notes.deviations` (`{what, why, ir_field}`) at the moment they happen, IR re-validated → tier evidence saved to `impl/logs/` per `references/tiers.md` (T0 `t0_smoke.txt`, T1 overfit CSV+curve, T2 trend dir, T3 comparison table; evidence headers name command+seed) → manifest `tier_reached` never exceeds the evidence. `references/implementation-patterns.md` fixes the IR→module mapping discipline and assumed/unknown resolution protocol; `references/pytorch-patterns.md` fixes seeding, symbolic-dim shape assertions, frozen-gradient tests, and config-driven device choice. Reviewer gate (implementation-reviewer) is wired in by Task 8.
+`ditto:code` turns a validated IR into `runs/<slug>/impl/`: workflow = official-repo check (record-only) → declare `tier_target` in the manifest → implementation plan mapping components/equations to modules → smallest-first implementation with `config_paper.yaml` (faithful, src comments, RESOLVED markers) + `config_small.yaml` (minutes on CPU) → deviations appended to `implementation_notes.deviations` (`{what, why, ir_field}`) at the moment they happen, IR re-validated → tier evidence saved to `impl/logs/` per `references/tiers.md` (T0 `t0_smoke.txt`, T1 overfit CSV+curve, T2 trend dir, T3 comparison table; evidence headers name command+seed) → manifest `tier_reached` never exceeds the evidence. `references/implementation-patterns.md` fixes the IR→module mapping discipline and assumed/unknown resolution protocol; `references/pytorch-patterns.md` fixes seeding, symbolic-dim shape assertions, frozen-gradient tests, and config-driven device choice.
+
+**Reviewer gate:** before any tier claim, `implementation-reviewer` (fresh-context, read-only) reviews `impl/` against `ir.yaml` across four check classes — equation-vs-code, config-vs-status (assumption hardcoded as fact = HIGH), unlogged deviations, test honesty — emitting one `path:line: [SEV] problem. fix.` line per finding and a `VERDICT: … — BLOCK|PASS` summary saved to `impl/logs/review_<tier>.md`. Any HIGH/MED finding blocks `tier_reached` until fixed and re-reviewed, or explicitly user-accepted (recorded as a deviation).
 
 ## Explain skill (`skills/explain/SKILL.md`)
 

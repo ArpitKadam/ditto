@@ -237,7 +237,7 @@ Status values: `pending | in-progress | done`. Update in place as work progresse
 - **Accept:** Skill dry-runs on test paper 1 (LoRA) reaching T0 within the session.
 - **Verify:** `uv run pytest` inside `impl/`; shape-assertion tests pass.
 
-**Task 8 — `implementation-reviewer` subagent** · Status: pending
+**Task 8 — `implementation-reviewer` subagent** · Status: done
 - **Goal:** Fresh-context bias check.
 - **Do:** `agents/implementation-reviewer.md`: input = `ir.yaml` + `impl/` diff, no implementer context. Checks each equation against its implementing code, config values against IR statuses (an `assumed` value silently hardcoded as fact = finding), unlogged deviations. One severity-tagged line per finding. Wire into `ditto:code` as a mandatory step before tier claims.
 - **Accept:** Reviewer run on Task 7's output produces a findings list; seeded bug (wrong sign in loss) is caught in a test run.
