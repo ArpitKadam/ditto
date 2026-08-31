@@ -25,19 +25,29 @@ Built so far (Task 1):
 ```text
 ditto/
 ├── .claude-plugin/plugin.json   # plugin manifest
+├── skills/
+│   └── ingest/SKILL.md          # DONE: paper → validated IR (resumable; reads manifest, skips done stages)
+├── agents/
+│   └── ir-auditor.md            # DONE: fresh-context provenance audit (read-only: Read/Grep/Glob)
 ├── pipeline/                    # plain Python package; skills invoke, never reimplement
 │   ├── __init__.py
 │   ├── fetch.py                 # DONE: resolve input → download source (e-print / html / pdf / local)
 │   ├── extract.py               # DONE: source → paper.md + figures/ (+ pages/ for pdf)
 │   ├── ir_build.py              # DONE: scaffold ir.yaml skeleton for Claude to fill; --derive resync
 │   ├── ir_validate.py           # DONE: schema check + provenance lint + status coverage + mirror
-│   └── workspace.py             # DONE: run dir creation, manifest read/write
+│   └── workspace.py             # DONE: run dir creation, manifest read/write, mark_stage + CLI
 ├── tests/                       # pytest; fixtures = the three test papers
 ├── pyproject.toml               # uv-managed, package = false, requires-python >=3.11.5
 └── runs/                        # gitignored; per-paper workspaces
 ```
 
-Pending (created by the task that first fills them): `skills/{ingest,explain,code,visualize,report}/`, `agents/{ir-auditor,implementation-reviewer,viz-reviewer}.md`, `templates/`. The IR skeleton is generated in code (`ir_build.skeleton`), not from a template file — same precedent as the manifest.
+Pending (created by the task that first fills them): `skills/{explain,code,visualize,report}/`, `agents/{implementation-reviewer,viz-reviewer}.md`, `templates/`. The IR skeleton is generated in code (`ir_build.skeleton`), not from a template file — same precedent as the manifest.
+
+## Ingest skill (`skills/ingest/SKILL.md`) + auditor (`agents/ir-auditor.md`)
+
+`ditto:ingest` is resumable by contract: every step reads `manifest.yaml` / workspace state and skips what is already done. Workflow: fetch → extract → `ir_build` scaffold → **fill** (Claude judgment: statuses never upgraded, `src` mandatory for stated/inferred, viewing the architecture diagram mandatory when present, equation LaTeX verbatim) → `ir_build --derive` → `ir_validate` until clean → spawn `ir-auditor` → save its report to `ir_audit.md` (zero tolerance for UNSUPPORTED/CONTRADICTED) → `workspace mark` sets `ingest: done`, `ir: {done, validated: true}`. Pipeline commands use `uv run --directory "${CLAUDE_PLUGIN_ROOT}" python -m pipeline.<module> …` with absolute run paths (clean-install verification is Task 12).
+
+`ir-auditor` is a fresh-context, read-only agent (Read/Grep/Glob): samples 10 `stated`/`inferred` claims (always ≥1 equation, headline result, diagram pointer when present), resolves each `src` against `paper.md`/`source/`, verdicts SUPPORTED / UNSUPPORTED / CONTRADICTED with quoted evidence; unfindable src = UNSUPPORTED, paraphrased equation = CONTRADICTED.
 
 ## IR build (`pipeline/ir_build.py`)
 
@@ -81,6 +91,7 @@ runs/<paper-slug>/
 ├── pages/             # pdf path only: rendered pages page01.png …
 ├── paper.md           # normalized text extraction (LaTeX preserved in math blocks)
 ├── ir.yaml            # the Paper IR
+├── ir_audit.md        # ir-auditor provenance report (Task 5 addition)
 ├── manifest.yaml      # stage tracker (Contract 3)
 ├── impl/              # ditto:code output — package, tests, configs, logs
 ├── viz/               # ditto:visualize output

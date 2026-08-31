@@ -215,7 +215,7 @@ Status values: `pending | in-progress | done`. Update in place as work progresse
 - **Accept:** Validator catches seeded violations (test cases for each rule); a hand-filled partial IR for one paper validates clean.
 - **Verify:** pytest on validator rules; run against a deliberately broken IR.
 
-**Task 5 — `ditto:ingest` skill + IR quality gate** · Status: pending
+**Task 5 — `ditto:ingest` skill + IR quality gate** · Status: done
 - **Goal:** The first real skill; IR proven sufficient on all three papers.
 - **Do:** Write `skills/ingest/SKILL.md`: workflow = fetch → extract → fill IR from `paper.md` + figures (viewing the architecture diagram is mandatory when present) → validate → update manifest. Spawn `ir-auditor` subagent (write `agents/ir-auditor.md`): fresh context, checks 10 sampled IR claims against `source/` via their `src` pointers, flags fabrications. Then run ingest end-to-end on all three test papers.
 - **Accept — the IR quality gate:** From `ir.yaml` alone (source hidden), answer for each paper: exact loss function, full optimizer recipe with per-field confidence status, layer-by-layer architecture. Auditor finds zero fabricated `src` pointers. Any failure → fix schema or extraction, append `DECISIONS.md`, re-run. **Schema freezes after this task.**
