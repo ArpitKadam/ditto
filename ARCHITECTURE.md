@@ -26,7 +26,8 @@ Built so far (Task 1):
 ditto/
 ├── .claude-plugin/plugin.json   # plugin manifest
 ├── skills/
-│   └── ingest/SKILL.md          # DONE: paper → validated IR (resumable; reads manifest, skips done stages)
+│   ├── ingest/SKILL.md          # DONE: paper → validated IR (resumable; reads manifest, skips done stages)
+│   └── explain/                 # DONE: IR → explain.md walkthrough (+ references/explanation-template.md)
 ├── agents/
 │   └── ir-auditor.md            # DONE: fresh-context provenance audit (read-only: Read/Grep/Glob)
 ├── pipeline/                    # plain Python package; skills invoke, never reimplement
@@ -35,13 +36,18 @@ ditto/
 │   ├── extract.py               # DONE: source → paper.md + figures/ (+ pages/ for pdf)
 │   ├── ir_build.py              # DONE: scaffold ir.yaml skeleton for Claude to fill; --derive resync
 │   ├── ir_validate.py           # DONE: schema check + provenance lint + status coverage + mirror
+│   ├── rasterize.py             # DONE: on-demand PDF/EPS figure → PNG (for Markdown embedding)
 │   └── workspace.py             # DONE: run dir creation, manifest read/write, mark_stage + CLI
 ├── tests/                       # pytest; fixtures = the three test papers
 ├── pyproject.toml               # uv-managed, package = false, requires-python >=3.11.5
 └── runs/                        # gitignored; per-paper workspaces
 ```
 
-Pending (created by the task that first fills them): `skills/{explain,code,visualize,report}/`, `agents/{implementation-reviewer,viz-reviewer}.md`, `templates/`. The IR skeleton is generated in code (`ir_build.skeleton`), not from a template file — same precedent as the manifest.
+Pending (created by the task that first fills them): `skills/{code,visualize,report}/`, `agents/{implementation-reviewer,viz-reviewer}.md`, `templates/`. The IR skeleton is generated in code (`ir_build.skeleton`), not from a template file — same precedent as the manifest.
+
+## Explain skill (`skills/explain/SKILL.md`)
+
+`ditto:explain` turns a validated IR into `runs/<slug>/explain.md` (template: `skills/explain/references/explanation-template.md`; structure: problem → idea → equation-keyed method walkthrough → architecture with embedded diagram → training-recipe table with confidence column → claimed results → what-you'd-have-to-guess → IR gaps). Disciplines: IR-first sourcing (zooming into `source/` is recorded as an IR gap in the document's final section); equations rendered as self-contained LaTeX — author `\newcommand` macros expanded from the `source/` preamble, `$$`-wrapped, `\label` dropped (the IR itself stays verbatim); vector diagrams rasterized on demand via `pipeline/rasterize.py` (PyMuPDF, 150 dpi PNG next to the original; `figures.yaml` keeps pointing at the original) and embedded as PNG; precondition `ir: validated`; marks `explain: done` via `workspace mark`.
 
 ## Ingest skill (`skills/ingest/SKILL.md`) + auditor (`agents/ir-auditor.md`)
 

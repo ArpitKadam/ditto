@@ -173,6 +173,50 @@ def test_multiple_seeded_violations_all_reported(tmp_path):
     assert len(_findings(ir)) >= 3
 
 
+# --- supplemental sub-field entries (Task 6 mirror widening) ----------------
+
+
+def test_supplemental_unknown_accepted(tmp_path):
+    _, ir = _clean_ir(tmp_path)
+    ir["implementation_notes"]["unknowns"].append("training.init.sigma_A")
+    assert _findings(ir) == []
+
+
+def test_supplemental_assumption_accepted(tmp_path):
+    _, ir = _clean_ir(tmp_path)
+    ir["implementation_notes"]["assumptions"].append(
+        {"field": "training.optimizer.adam_betas", "value": "(0.9, 0.999)", "basis": "PyTorch default"}
+    )
+    assert _findings(ir) == []
+
+
+def test_supplemental_with_bogus_prefix_rejected(tmp_path):
+    _, ir = _clean_ir(tmp_path)
+    ir["implementation_notes"]["unknowns"].append("nonexistent.leaf.detail")
+    assert any("neither a tracked leaf nor a sub-detail" in f for f in _findings(ir))
+
+
+def test_supplemental_does_not_satisfy_missing_auto_entry(tmp_path):
+    _, ir = _clean_ir(tmp_path)
+    ir["implementation_notes"]["unknowns"].remove("training.init")
+    ir["implementation_notes"]["unknowns"].append("training.init.sigma")  # sub-detail is not the leaf
+    assert any("missing 'training.init'" in f for f in _findings(ir))
+
+
+def test_derive_preserves_supplemental_entries(tmp_path):
+    _, ir = _clean_ir(tmp_path)
+    ir["implementation_notes"]["unknowns"].append("training.init.sigma_A")
+    ir["implementation_notes"]["assumptions"].append(
+        {"field": "training.optimizer.adam_betas", "value": "(0.9, 0.999)", "basis": "PyTorch default"}
+    )
+    ir_build.derive_notes(ir)
+    assert "training.init.sigma_A" in ir["implementation_notes"]["unknowns"]
+    assert {"field": "training.optimizer.adam_betas", "value": "(0.9, 0.999)", "basis": "PyTorch default"} in ir[
+        "implementation_notes"
+    ]["assumptions"]
+    assert _findings(ir) == []
+
+
 # --- a hand-filled partial IR must validate clean ---------------------------
 
 

@@ -76,6 +76,11 @@ Read `paper.md` and fill `ir.yaml`. Rules:
   `training.objective` exactly — the formula or its equation id, not a vibe.
   A hyperparameter the paper omits is `unknown` or `assumed`-with-basis,
   never silently invented.
+- **Sub-details a `stated` field leaves unspecified** (an init σ, Adam
+  β/ε, a GPU count) do not demote the field — they get **supplemental
+  entries** in `implementation_notes.unknowns`/`assumptions` whose path
+  extends the leaf (e.g. `training.init.sigma_A`); `--derive` preserves
+  them and the validator checks their prefix.
 - **Official repo:** if `paper.official_repo.url` is set, record it; do not
   fetch the repo during ingest.
 - **Dependencies:** cited works the method leans on for setup/recipe go in

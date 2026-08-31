@@ -223,7 +223,7 @@ Status values: `pending | in-progress | done`. Update in place as work progresse
 
 ### Phase 2 — Explain
 
-**Task 6 — `ditto:explain`** · Status: pending
+**Task 6 — `ditto:explain`** · Status: done
 - **Goal:** IR → `explain.md` walkthrough; doubles as IR validation.
 - **Do:** SKILL.md + `references/explanation-template.md`: problem → intuition → method walkthrough keyed to equations (rendered with meaning, not just restated) → architecture (embed diagram) → training recipe with confidence statuses surfaced honestly → what's unknown. Zoom into `source/` via `src` pointers where the IR is thin — and if that happens, the IR was deficient: log it.
 - **Accept:** Explanations for all three papers; a reader can state the method's core mechanism and every assumption without opening the paper; no claims absent from IR + source.

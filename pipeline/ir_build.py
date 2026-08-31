@@ -35,8 +35,11 @@ _HEADER = """\
 #   src: pointer into paper.md / source — section, equation, page, or figure ("§3.2", "eq4", "fig1")
 # Validator rules:
 #   - every stated/inferred field needs a non-empty src
-#   - implementation_notes.assumptions/unknowns exactly mirror fields tagged assumed/unknown
-#     (resync mechanically: `python -m pipeline.ir_build <run_dir> --derive`)
+#   - implementation_notes.assumptions/unknowns mirror fields tagged assumed/unknown
+#     (resync mechanically: `python -m pipeline.ir_build <run_dir> --derive`);
+#     sub-details of a stated field may be added manually as supplemental entries
+#     whose path extends a tracked leaf (e.g. training.init.sigma_A) — --derive
+#     preserves them
 #   - equations need id, src, and balanced latex
 """
 
@@ -73,26 +76,31 @@ def status_fields(ir: dict) -> dict[str, dict]:
 def derive_notes(ir: dict) -> None:
     """Regenerate implementation_notes.assumptions/unknowns from field statuses.
 
-    Hand-written `basis` text is preserved per field; deviations are untouched.
+    Hand-written `basis` text is preserved per field, and supplemental entries
+    (paths extending a tracked leaf, e.g. training.init.sigma_A) are carried
+    over untouched; deviations are untouched.
     """
     notes = ir.setdefault("implementation_notes", {})
-    prior = {
-        a.get("field"): a
-        for a in notes.get("assumptions") or []
-        if isinstance(a, dict)
-    }
     fields = status_fields(ir)
+    prior_assumptions = [
+        a for a in notes.get("assumptions") or [] if isinstance(a, dict)
+    ]
+    prior_by_field = {a.get("field"): a for a in prior_assumptions}
     notes["assumptions"] = [
         {
             "field": path,
             "value": node.get("value") or node.get("spec") or "",
-            "basis": prior.get(path, {}).get("basis", ""),
+            "basis": prior_by_field.get(path, {}).get("basis", ""),
         }
         for path, node in fields.items()
         if node.get("status") == "assumed"
-    ]
+    ] + [a for a in prior_assumptions if a.get("field") not in fields]
     notes["unknowns"] = [
         path for path, node in fields.items() if node.get("status") == "unknown"
+    ] + [
+        u
+        for u in notes.get("unknowns") or []
+        if isinstance(u, str) and u not in fields
     ]
     notes.setdefault("deviations", [])
 

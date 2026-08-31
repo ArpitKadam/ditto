@@ -73,6 +73,13 @@ def _check_status_leaf(path: str, node: dict, findings: list[str]) -> None:
         findings.append(f"{path}: status {status!r} requires a non-empty src")
 
 
+def _is_supplemental(path: str, fields: dict) -> bool:
+    """True for a sub-detail path extending a tracked leaf, e.g. training.init.sigma_A."""
+    return isinstance(path, str) and any(
+        path.startswith(leaf + ".") and len(path) > len(leaf) + 1 for leaf in fields
+    )
+
+
 def _check_mirror(ir: dict, findings: list[str]) -> None:
     notes = ir.get("implementation_notes")
     if not isinstance(notes, dict):
@@ -90,7 +97,12 @@ def _check_mirror(ir: dict, findings: list[str]) -> None:
         for p in sorted(want_unknown - have):
             findings.append(f"implementation_notes.unknowns: missing {p!r} (field is tagged unknown)")
         for p in sorted(have - want_unknown):
-            findings.append(f"implementation_notes.unknowns: stale entry {p!r} (field is not tagged unknown)")
+            if p in fields:
+                findings.append(f"implementation_notes.unknowns: stale entry {p!r} (field is not tagged unknown)")
+            elif not _is_supplemental(p, fields):
+                findings.append(
+                    f"implementation_notes.unknowns: entry {p!r} is neither a tracked leaf nor a sub-detail of one"
+                )
 
     assumptions = notes.get("assumptions")
     if not isinstance(assumptions, list) or not all(isinstance(a, dict) for a in assumptions):
@@ -99,8 +111,13 @@ def _check_mirror(ir: dict, findings: list[str]) -> None:
         have = {a.get("field") for a in assumptions}
         for p in sorted(want_assumed - have):
             findings.append(f"implementation_notes.assumptions: missing {p!r} (field is tagged assumed)")
-        for p in sorted(have - want_assumed):
-            findings.append(f"implementation_notes.assumptions: stale entry {p!r} (field is not tagged assumed)")
+        for p in sorted(have - want_assumed, key=str):
+            if p in fields:
+                findings.append(f"implementation_notes.assumptions: stale entry {p!r} (field is not tagged assumed)")
+            elif not _is_supplemental(p, fields):
+                findings.append(
+                    f"implementation_notes.assumptions: entry {p!r} is neither a tracked leaf nor a sub-detail of one"
+                )
 
     if not isinstance(notes.get("deviations"), list):
         findings.append("implementation_notes.deviations: must be a list")
