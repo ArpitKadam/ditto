@@ -29,7 +29,8 @@ ditto/
 │   ├── ingest/SKILL.md          # DONE: paper → validated IR (resumable; reads manifest, skips done stages)
 │   ├── explain/                 # DONE: IR → explain.md walkthrough (+ references/explanation-template.md)
 │   ├── code/                    # DONE: IR → tier-verified impl/ (+ references/{tiers,implementation-patterns,pytorch-patterns}.md)
-│   └── visualize/               # DONE: IR + impl/logs → viz/ (+ references/plotting-patterns.md, scripts/{architecture,training,attention}_viz.py + _style.py)
+│   ├── visualize/               # DONE: IR + impl/logs → viz/ (+ references/plotting-patterns.md, scripts/{architecture,training,attention}_viz.py + _style.py)
+│   └── report/SKILL.md          # DONE: workspace state → report.md (template in templates/)
 ├── agents/
 │   ├── ir-auditor.md            # DONE: fresh-context provenance audit (read-only: Read/Grep/Glob)
 │   ├── implementation-reviewer.md  # DONE: fresh-context impl-vs-IR faithfulness gate (read-only)
@@ -42,12 +43,14 @@ ditto/
 │   ├── ir_validate.py           # DONE: schema check + provenance lint + status coverage + mirror
 │   ├── rasterize.py             # DONE: on-demand PDF/EPS figure → PNG (for Markdown embedding)
 │   └── workspace.py             # DONE: run dir creation, manifest read/write, mark_stage + CLI
+├── templates/
+│   └── reproduction-report.md   # DONE: report.md structure + the two sourcing rules + self-check
 ├── tests/                       # pytest; fixtures = the three test papers
 ├── pyproject.toml               # uv-managed, package = false, requires-python >=3.11.5
 └── runs/                        # gitignored; per-paper workspaces
 ```
 
-Pending (created by the task that first fills them): `skills/report/`, `templates/`. The IR skeleton is generated in code (`ir_build.skeleton`), not from a template file — same precedent as the manifest.
+All five skills and three agents are built. The IR skeleton is generated in code (`ir_build.skeleton`), not from a template file — same precedent as the manifest.
 
 **Environment note:** `torch`/`torchvision` are CUDA builds (cu132) installed with `uv pip install --index-url https://download.pytorch.org/whl/cu132`, deliberately unmanaged by `pyproject.toml`/`uv.lock` (see the Task 7 decision) — fresh clones re-run that command.
 
@@ -62,6 +65,10 @@ Pending (created by the task that first fills them): `skills/report/`, `template
 `ditto:visualize` turns workspace state into `runs/<slug>/viz/`, every plot regenerable by re-running its script. Scripts (matplotlib only — no graphviz/torchview; see the Task 10 decision) live in `skills/visualize/scripts/` and share `_style.py` (Agg backend, validated status/arm palettes, recessive-grid rcParams): `architecture_viz.py` renders `ir.yaml architecture.layers` as a flow diagram color-coded by IR confidence with the status printed in every box (the diagram's job is claim confidence, not just topology); `training_viz.py` re-renders `impl/logs/t1_overfit.csv` (+ sibling `t1_*.csv` supporting arms, discovered by glob so no on-disk evidence is invisible) and `impl/logs/t2_trend/*.csv` (single-row CSV = baseline reference line), quoting each CSV's own `# produced by:` header as the provenance footer; `attention_viz.py` renders heatmaps from `impl/logs/attention/*.npz` dumps (the impl dumps, the script renders — the viz layer never instantiates impl models), run only when the IR says the method touches attention AND a dump exists. Honesty/style rules in `references/plotting-patterns.md`. Workflow: generate → **view every PNG** (a written file is a claim, not evidence) → `viz-reviewer` gate → save report to `viz/review.md` → `workspace mark visualize status=done`.
 
 `viz-reviewer` is a fresh-context, read-only agent (Read/Grep/Glob, views PNGs via Read): checks every printed number against its CSV, series against the evidence directory **in both directions** (nothing invented, nothing on disk silently missing), diagram boxes/statuses/colors against the IR, provenance footers against actual file headers, and axis honesty. Same severity-line + VERDICT format as implementation-reviewer; HIGH/MED blocks the stage mark.
+
+## Report skill (`skills/report/SKILL.md`)
+
+`ditto:report` turns full workspace state into `runs/<slug>/report.md` — the payoff artifact. No scripts, no pipeline additions (Task 11 decision): the skill is a reading-and-writing contract governed by `templates/reproduction-report.md` and its two rules — **no number without a source** (claimed numbers cite IR `src`, achieved numbers cite `impl/logs/` paths) and **never fake a comparison** (one claims-table row per `evaluation.headline_results` entry with a per-row `tested?` verdict; below T3, `not attempted` rows are the honest deliverable, never dropped or paired with non-comparable local numbers). Fixed sections: verdict → tier scorecard (including `*_failed_*` negative evidence) → claimed-vs-achieved → assumptions/unknowns with resolutions → full deviations log → unknowns-that-mattered (risk-ranked; benign tier-scope cuts separated) → compute (evidence headers only) → path to T3 (must answer "what would it take" concretely) → reviewer gates. Workflow: read all evidence → draft from template → trace pass (re-locate every number in its cited source; template self-check) → `workspace mark report status=done`. Preconditions: `ir: validated` + `code: done` with `tier_reached`; viz optional.
 
 ## Explain skill (`skills/explain/SKILL.md`)
 

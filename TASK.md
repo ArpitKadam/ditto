@@ -257,7 +257,7 @@ Status values: `pending | in-progress | done`. Update in place as work progresse
 - **Accept:** Architecture + training visualizations for papers 1–2; each plot regenerable from a script, not a one-off.
 - **Verify:** Scripts re-run clean from workspace state alone.
 
-**Task 11 — `ditto:report`** · Status: pending
+**Task 11 — `ditto:report`** · Status: done
 - **Goal:** The payoff artifact.
 - **Do:** SKILL.md + `templates/reproduction-report.md`: claimed vs. achieved table (from `evaluation.headline_results` × `impl/logs/`), tier target vs. reached, full assumptions table (from IR statuses), deviations log, unknowns that mattered, compute used, honest verdict. No number without a source (IR `src` or log path).
 - **Accept:** Reports for papers 1–2; every number traceable; verdict matches evidence.
