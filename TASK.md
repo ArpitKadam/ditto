@@ -231,7 +231,7 @@ Status values: `pending | in-progress | done`. Update in place as work progresse
 
 ### Phase 3 — Code
 
-**Task 7 — `ditto:code` skill** · Status: pending
+**Task 7 — `ditto:code` skill** · Status: done
 - **Goal:** IR → working implementation in `impl/`, tier-verified.
 - **Do:** SKILL.md workflow: (0) official repo check — if exists, note diff-validation plan; (1) declare `tier_target` in manifest; (2) implementation plan mapping IR components/equations → modules; (3) implement smallest-first (ponytail ladder applies), `config_paper.yaml` + `config_small.yaml`; (4) every deviation from IR appended to `implementation_notes.deviations` **as it happens**; (5) tier evidence saved to `impl/logs/`. References: `implementation-patterns.md`, `pytorch-patterns.md`, `tiers.md` (Contract 4 expanded with exact evidence formats).
 - **Accept:** Skill dry-runs on test paper 1 (LoRA) reaching T0 within the session.

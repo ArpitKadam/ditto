@@ -27,7 +27,8 @@ ditto/
 ├── .claude-plugin/plugin.json   # plugin manifest
 ├── skills/
 │   ├── ingest/SKILL.md          # DONE: paper → validated IR (resumable; reads manifest, skips done stages)
-│   └── explain/                 # DONE: IR → explain.md walkthrough (+ references/explanation-template.md)
+│   ├── explain/                 # DONE: IR → explain.md walkthrough (+ references/explanation-template.md)
+│   └── code/                    # DONE: IR → tier-verified impl/ (+ references/{tiers,implementation-patterns,pytorch-patterns}.md)
 ├── agents/
 │   └── ir-auditor.md            # DONE: fresh-context provenance audit (read-only: Read/Grep/Glob)
 ├── pipeline/                    # plain Python package; skills invoke, never reimplement
@@ -43,7 +44,13 @@ ditto/
 └── runs/                        # gitignored; per-paper workspaces
 ```
 
-Pending (created by the task that first fills them): `skills/{code,visualize,report}/`, `agents/{implementation-reviewer,viz-reviewer}.md`, `templates/`. The IR skeleton is generated in code (`ir_build.skeleton`), not from a template file — same precedent as the manifest.
+Pending (created by the task that first fills them): `skills/{visualize,report}/`, `agents/{implementation-reviewer,viz-reviewer}.md`, `templates/`. The IR skeleton is generated in code (`ir_build.skeleton`), not from a template file — same precedent as the manifest.
+
+**Environment note:** `torch`/`torchvision` are CUDA builds (cu132) installed with `uv pip install --index-url https://download.pytorch.org/whl/cu132`, deliberately unmanaged by `pyproject.toml`/`uv.lock` (see the Task 7 decision) — fresh clones re-run that command.
+
+## Code skill (`skills/code/SKILL.md`)
+
+`ditto:code` turns a validated IR into `runs/<slug>/impl/`: workflow = official-repo check (record-only) → declare `tier_target` in the manifest → implementation plan mapping components/equations to modules → smallest-first implementation with `config_paper.yaml` (faithful, src comments, RESOLVED markers) + `config_small.yaml` (minutes on CPU) → deviations appended to `implementation_notes.deviations` (`{what, why, ir_field}`) at the moment they happen, IR re-validated → tier evidence saved to `impl/logs/` per `references/tiers.md` (T0 `t0_smoke.txt`, T1 overfit CSV+curve, T2 trend dir, T3 comparison table; evidence headers name command+seed) → manifest `tier_reached` never exceeds the evidence. `references/implementation-patterns.md` fixes the IR→module mapping discipline and assumed/unknown resolution protocol; `references/pytorch-patterns.md` fixes seeding, symbolic-dim shape assertions, frozen-gradient tests, and config-driven device choice. Reviewer gate (implementation-reviewer) is wired in by Task 8.
 
 ## Explain skill (`skills/explain/SKILL.md`)
 
