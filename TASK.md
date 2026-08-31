@@ -251,7 +251,7 @@ Status values: `pending | in-progress | done`. Update in place as work progresse
 
 ### Phase 4 — Visualize and report
 
-**Task 10 — `ditto:visualize`** · Status: pending
+**Task 10 — `ditto:visualize`** · Status: done
 - **Goal:** `viz/` outputs from IR + `impl/`.
 - **Do:** SKILL.md + scripts: `architecture_viz.py` (graph from IR layers, torchview/graphviz), `training_viz.py` (curves from `impl/logs/`), `attention_viz.py` (only when the method warrants it — skill must decide from IR, not run unconditionally). Reference: `plotting-patterns.md` (readable defaults, no chartjunk). `viz-reviewer` agent optional-lightweight: checks plots against the numbers they claim to show.
 - **Accept:** Architecture + training visualizations for papers 1–2; each plot regenerable from a script, not a one-off.

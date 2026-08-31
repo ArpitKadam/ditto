@@ -28,10 +28,12 @@ ditto/
 ├── skills/
 │   ├── ingest/SKILL.md          # DONE: paper → validated IR (resumable; reads manifest, skips done stages)
 │   ├── explain/                 # DONE: IR → explain.md walkthrough (+ references/explanation-template.md)
-│   └── code/                    # DONE: IR → tier-verified impl/ (+ references/{tiers,implementation-patterns,pytorch-patterns}.md)
+│   ├── code/                    # DONE: IR → tier-verified impl/ (+ references/{tiers,implementation-patterns,pytorch-patterns}.md)
+│   └── visualize/               # DONE: IR + impl/logs → viz/ (+ references/plotting-patterns.md, scripts/{architecture,training,attention}_viz.py + _style.py)
 ├── agents/
 │   ├── ir-auditor.md            # DONE: fresh-context provenance audit (read-only: Read/Grep/Glob)
-│   └── implementation-reviewer.md  # DONE: fresh-context impl-vs-IR faithfulness gate (read-only)
+│   ├── implementation-reviewer.md  # DONE: fresh-context impl-vs-IR faithfulness gate (read-only)
+│   └── viz-reviewer.md          # DONE: fresh-context plot-vs-numbers honesty check (read-only)
 ├── pipeline/                    # plain Python package; skills invoke, never reimplement
 │   ├── __init__.py
 │   ├── fetch.py                 # DONE: resolve input → download source (e-print / html / pdf / local)
@@ -45,7 +47,7 @@ ditto/
 └── runs/                        # gitignored; per-paper workspaces
 ```
 
-Pending (created by the task that first fills them): `skills/{visualize,report}/`, `agents/{implementation-reviewer,viz-reviewer}.md`, `templates/`. The IR skeleton is generated in code (`ir_build.skeleton`), not from a template file — same precedent as the manifest.
+Pending (created by the task that first fills them): `skills/report/`, `templates/`. The IR skeleton is generated in code (`ir_build.skeleton`), not from a template file — same precedent as the manifest.
 
 **Environment note:** `torch`/`torchvision` are CUDA builds (cu132) installed with `uv pip install --index-url https://download.pytorch.org/whl/cu132`, deliberately unmanaged by `pyproject.toml`/`uv.lock` (see the Task 7 decision) — fresh clones re-run that command.
 
@@ -54,6 +56,12 @@ Pending (created by the task that first fills them): `skills/{visualize,report}/
 `ditto:code` turns a validated IR into `runs/<slug>/impl/`: workflow = official-repo check (record-only) → declare `tier_target` in the manifest → implementation plan mapping components/equations to modules → smallest-first implementation with `config_paper.yaml` (faithful, src comments, RESOLVED markers) + `config_small.yaml` (minutes on CPU) → deviations appended to `implementation_notes.deviations` (`{what, why, ir_field}`) at the moment they happen, IR re-validated → tier evidence saved to `impl/logs/` per `references/tiers.md` (T0 `t0_smoke.txt`, T1 overfit CSV+curve, T2 trend dir, T3 comparison table; evidence headers name command+seed) → manifest `tier_reached` never exceeds the evidence. `references/implementation-patterns.md` fixes the IR→module mapping discipline and assumed/unknown resolution protocol; `references/pytorch-patterns.md` fixes seeding, symbolic-dim shape assertions, frozen-gradient tests, and config-driven device choice.
 
 **Reviewer gate:** before any tier claim, `implementation-reviewer` (fresh-context, read-only) reviews `impl/` against `ir.yaml` across four check classes — equation-vs-code, config-vs-status (assumption hardcoded as fact = HIGH), unlogged deviations, test honesty — emitting one `path:line: [SEV] problem. fix.` line per finding and a `VERDICT: … — BLOCK|PASS` summary saved to `impl/logs/review_<tier>.md`. Any HIGH/MED finding blocks `tier_reached` until fixed and re-reviewed, or explicitly user-accepted (recorded as a deviation).
+
+## Visualize skill (`skills/visualize/SKILL.md`) + reviewer (`agents/viz-reviewer.md`)
+
+`ditto:visualize` turns workspace state into `runs/<slug>/viz/`, every plot regenerable by re-running its script. Scripts (matplotlib only — no graphviz/torchview; see the Task 10 decision) live in `skills/visualize/scripts/` and share `_style.py` (Agg backend, validated status/arm palettes, recessive-grid rcParams): `architecture_viz.py` renders `ir.yaml architecture.layers` as a flow diagram color-coded by IR confidence with the status printed in every box (the diagram's job is claim confidence, not just topology); `training_viz.py` re-renders `impl/logs/t1_overfit.csv` (+ sibling `t1_*.csv` supporting arms, discovered by glob so no on-disk evidence is invisible) and `impl/logs/t2_trend/*.csv` (single-row CSV = baseline reference line), quoting each CSV's own `# produced by:` header as the provenance footer; `attention_viz.py` renders heatmaps from `impl/logs/attention/*.npz` dumps (the impl dumps, the script renders — the viz layer never instantiates impl models), run only when the IR says the method touches attention AND a dump exists. Honesty/style rules in `references/plotting-patterns.md`. Workflow: generate → **view every PNG** (a written file is a claim, not evidence) → `viz-reviewer` gate → save report to `viz/review.md` → `workspace mark visualize status=done`.
+
+`viz-reviewer` is a fresh-context, read-only agent (Read/Grep/Glob, views PNGs via Read): checks every printed number against its CSV, series against the evidence directory **in both directions** (nothing invented, nothing on disk silently missing), diagram boxes/statuses/colors against the IR, provenance footers against actual file headers, and axis honesty. Same severity-line + VERDICT format as implementation-reviewer; HIGH/MED blocks the stage mark.
 
 ## Explain skill (`skills/explain/SKILL.md`)
 
