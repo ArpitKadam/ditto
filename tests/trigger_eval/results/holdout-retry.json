@@ -1,0 +1,62 @@
+{
+  "label": "holdout-retry",
+  "set": "tests/trigger_eval/holdout.yaml",
+  "model": "haiku",
+  "positives": "5/5",
+  "negatives_clean": "0/0",
+  "misses": [],
+  "false_fires": [],
+  "errors": [],
+  "rows": [
+    {
+      "id": "h-ingest-03",
+      "kind": "indirect",
+      "query": "Pull down the BERT paper and get it ready for a reproduction attempt",
+      "expect": [
+        "ingest"
+      ],
+      "got": "ingest",
+      "ok": true
+    },
+    {
+      "id": "h-code-02",
+      "kind": "indirect",
+      "query": "Build the model from the paper's IR and show a single-batch overfit",
+      "expect": [
+        "code"
+      ],
+      "got": "code",
+      "ok": true
+    },
+    {
+      "id": "h-code-03",
+      "kind": "indirect",
+      "query": "Check our reproduction code against the paper's equations for faithfulness",
+      "expect": [
+        "code"
+      ],
+      "got": "code",
+      "ok": true
+    },
+    {
+      "id": "h-code-04",
+      "kind": "indirect",
+      "query": "The grokking paper is ingested, now make the method actually run and learn",
+      "expect": [
+        "code"
+      ],
+      "got": "code",
+      "ok": true
+    },
+    {
+      "id": "h-visualize-01",
+      "kind": "direct",
+      "query": "Generate the architecture and training visualizations for the LoRA run",
+      "expect": [
+        "visualize"
+      ],
+      "got": "visualize",
+      "ok": true
+    }
+  ]
+}

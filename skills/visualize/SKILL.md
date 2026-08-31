@@ -1,6 +1,6 @@
 ---
 name: visualize
-description: Generate architecture, training, and (when warranted) attention visualizations into a run's viz/ directory from the Paper IR and impl/logs evidence. Use whenever the user asks to visualize, plot, or diagram an ingested paper's architecture or training results, or after ditto:code completes.
+description: Generate architecture, training, and (when warranted) attention visualizations into a run's viz/ directory from the Paper IR and impl/logs evidence. Use whenever the user asks to visualize, plot, chart, diagram, or render anything about a ditto run or reproduced paper — architecture or layer diagrams, training or loss curves, attention maps — says "ditto visualize", or after ditto:code completes. Do not skip because no run is visible in the current directory: invoke this skill — it locates the run workspace from the manifest and reports cleanly if prerequisites are missing.
 ---
 
 # ditto:visualize — IR + impl/logs → viz/

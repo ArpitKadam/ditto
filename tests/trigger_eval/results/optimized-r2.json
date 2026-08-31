@@ -1,0 +1,255 @@
+{
+  "label": "optimized-r2",
+  "set": "tests/trigger_eval/queries.yaml",
+  "model": "haiku",
+  "positives": "10/11",
+  "negatives_clean": "12/12",
+  "misses": [
+    {
+      "id": "explain-02",
+      "expect": [
+        "explain",
+        "ingest"
+      ],
+      "got": "none"
+    }
+  ],
+  "false_fires": [],
+  "errors": [],
+  "rows": [
+    {
+      "id": "explain-01",
+      "kind": "direct",
+      "query": "Explain the paper we ingested with ditto",
+      "expect": [
+        "explain"
+      ],
+      "got": "explain",
+      "ok": true
+    },
+    {
+      "id": "explain-02",
+      "kind": "indirect",
+      "query": "Walk me through the LoRA paper's method",
+      "expect": [
+        "explain",
+        "ingest"
+      ],
+      "got": "none",
+      "ok": false
+    },
+    {
+      "id": "explain-03",
+      "kind": "direct",
+      "query": "Generate the explanation walkthrough for run 2106.09685",
+      "expect": [
+        "explain"
+      ],
+      "got": "explain",
+      "ok": true
+    },
+    {
+      "id": "explain-04",
+      "kind": "indirect",
+      "query": "The DDPM paper is already ingested \u2014 help me actually understand how the method works",
+      "expect": [
+        "explain"
+      ],
+      "got": "explain",
+      "ok": true
+    },
+    {
+      "id": "explain-05",
+      "kind": "direct",
+      "query": "Write explain.md for the DDPM run",
+      "expect": [
+        "explain"
+      ],
+      "got": "explain",
+      "ok": true
+    },
+    {
+      "id": "explain-06",
+      "kind": "indirect",
+      "query": "Summarize the ingested paper's training recipe and what's unknown about it",
+      "expect": [
+        "explain"
+      ],
+      "got": "explain",
+      "ok": true
+    },
+    {
+      "id": "explain-07",
+      "kind": "indirect",
+      "query": "What does equation 4 mean in the paper we ingested? Walk me through the math",
+      "expect": [
+        "explain"
+      ],
+      "got": "explain",
+      "ok": true
+    },
+    {
+      "id": "explain-08",
+      "kind": "indirect",
+      "query": "Give me a readable walkthrough of arXiv 1503.02531",
+      "expect": [
+        "explain",
+        "ingest"
+      ],
+      "got": "ingest",
+      "ok": true
+    },
+    {
+      "id": "explain-09",
+      "kind": "indirect",
+      "query": "Break down the grokking paper for me \u2014 intuition first, then the method",
+      "expect": [
+        "explain",
+        "ingest"
+      ],
+      "got": "explain",
+      "ok": true
+    },
+    {
+      "id": "explain-10",
+      "kind": "indirect",
+      "query": "I need to present this ingested paper to my reading group tomorrow, help me understand it",
+      "expect": [
+        "explain"
+      ],
+      "got": "explain",
+      "ok": true
+    },
+    {
+      "id": "code-05",
+      "kind": "indirect",
+      "query": "How faithful is our implementation to the paper it reproduces?",
+      "expect": [
+        "code",
+        "report"
+      ],
+      "got": "code",
+      "ok": true
+    },
+    {
+      "id": "neg-01",
+      "kind": "negative",
+      "query": "Summarize this news article PDF for me",
+      "expect": [
+        "none"
+      ],
+      "got": "none",
+      "ok": true
+    },
+    {
+      "id": "neg-02",
+      "kind": "negative",
+      "query": "Implement quicksort in Python",
+      "expect": [
+        "none"
+      ],
+      "got": "init",
+      "ok": true
+    },
+    {
+      "id": "neg-03",
+      "kind": "negative",
+      "query": "Plot this CSV of sales data as a bar chart",
+      "expect": [
+        "none"
+      ],
+      "got": "none",
+      "ok": true
+    },
+    {
+      "id": "neg-04",
+      "kind": "negative",
+      "query": "Explain how the auth flow in this codebase works",
+      "expect": [
+        "none"
+      ],
+      "got": "init",
+      "ok": true
+    },
+    {
+      "id": "neg-05",
+      "kind": "negative",
+      "query": "Help me write a research paper about my experiment results",
+      "expect": [
+        "none"
+      ],
+      "got": "none",
+      "ok": true
+    },
+    {
+      "id": "neg-06",
+      "kind": "negative",
+      "query": "Review my resume PDF and suggest improvements",
+      "expect": [
+        "none"
+      ],
+      "got": "ToolSearch",
+      "ok": true
+    },
+    {
+      "id": "neg-07",
+      "kind": "negative",
+      "query": "What's new in PyTorch 2.5?",
+      "expect": [
+        "none"
+      ],
+      "got": "none",
+      "ok": true
+    },
+    {
+      "id": "neg-08",
+      "kind": "negative",
+      "query": "Fix the failing test in my repo",
+      "expect": [
+        "none"
+      ],
+      "got": "run",
+      "ok": true
+    },
+    {
+      "id": "neg-09",
+      "kind": "negative",
+      "query": "Draw a system architecture diagram of my microservices",
+      "expect": [
+        "none"
+      ],
+      "got": "run",
+      "ok": true
+    },
+    {
+      "id": "neg-10",
+      "kind": "negative",
+      "query": "Write a report on Q3 sales performance",
+      "expect": [
+        "none"
+      ],
+      "got": "none",
+      "ok": true
+    },
+    {
+      "id": "neg-11",
+      "kind": "negative",
+      "query": "Train a quick sentiment classifier on this dataset",
+      "expect": [
+        "none"
+      ],
+      "got": "none",
+      "ok": true
+    },
+    {
+      "id": "neg-12",
+      "kind": "negative",
+      "query": "Visualize my git history as a graph",
+      "expect": [
+        "none"
+      ],
+      "got": "none",
+      "ok": true
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 ---
 name: explain
-description: Generate a human-readable walkthrough (explain.md) of an ingested research paper from its Paper IR. Use whenever the user asks to explain, summarize, walk through, or understand a paper that ditto has ingested, or after ditto:ingest completes and the user wants the paper explained.
+description: Generate a human-readable walkthrough (explain.md) of an ingested research paper from its Paper IR. Use whenever the user asks to explain, summarize, walk through, break down, teach, or understand a research paper, its method, or its equations in the context of a ditto run — any mention of "the ingested paper", "the run", "ditto explain", a runs/ workspace, or a named research paper counts. Do not answer from memory, and do not skip because no run is visible in the current directory: invoke this skill — it locates the run workspace from the manifest and reports cleanly if none exists. Not for explaining codebases, source code, or general concepts with no research paper involved.
 ---
 
 # ditto:explain — IR → explain.md walkthrough

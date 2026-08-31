@@ -1,6 +1,6 @@
 ---
 name: report
-description: Write the reproduction report for an ingested-and-implemented paper — claimed vs. achieved, tier evidence, assumptions, deviations, honest verdict — into runs/<slug>/report.md. Use whenever the user asks for a reproduction report, a summary of how a reproduction went, or "did we reproduce this paper".
+description: Write the reproduction report for an ingested-and-implemented paper — claimed vs. achieved, tier evidence, assumptions, deviations, honest verdict — into runs/<slug>/report.md. Use whenever the user asks for a reproduction report or verdict, asks "did we reproduce this paper" or how a reproduction went, wants claimed-vs-achieved numbers, asks what was assumed or deviated, says "ditto report", or wants to close out or write up a run. Do not skip because no run is visible in the current directory: invoke this skill — it locates the run workspace from the manifest and reports cleanly if stages are missing.
 ---
 
 # ditto:report — workspace state → report.md

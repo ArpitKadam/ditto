@@ -1,0 +1,23 @@
+{
+  "label": "flaky-2",
+  "set": "tests/trigger_eval/queries.yaml",
+  "model": "haiku",
+  "positives": "1/1",
+  "negatives_clean": "0/0",
+  "misses": [],
+  "false_fires": [],
+  "errors": [],
+  "rows": [
+    {
+      "id": "explain-02",
+      "kind": "indirect",
+      "query": "Walk me through the LoRA paper's method",
+      "expect": [
+        "explain",
+        "ingest"
+      ],
+      "got": "explain",
+      "ok": true
+    }
+  ]
+}

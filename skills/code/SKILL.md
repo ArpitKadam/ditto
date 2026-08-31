@@ -1,6 +1,6 @@
 ---
 name: code
-description: Implement an ingested paper's method as working, tier-verified code in the run workspace. Use whenever the user asks to implement, reproduce, code up, or train the method of a paper that ditto has ingested, or asks how faithfully an implementation matches a paper.
+description: Implement an ingested paper's method as working, tier-verified code in the run workspace. Use whenever the user asks to implement, reproduce, code up, build, or train the method of a paper in a ditto run, mentions reaching a verification tier (T0–T3) or a single-batch overfit, says "ditto code", or asks how faithful an implementation is to its paper. Do not skip because no run is visible in the current directory: invoke this skill — it locates the run workspace from the manifest and reports cleanly if the ingest stage is missing.
 ---
 
 # ditto:code — IR → tier-verified implementation

@@ -1,0 +1,279 @@
+{
+  "label": "holdout",
+  "set": "tests/trigger_eval/holdout.yaml",
+  "model": "haiku",
+  "positives": "15/20",
+  "negatives_clean": "6/6",
+  "misses": [],
+  "false_fires": [],
+  "errors": [
+    "h-ingest-03",
+    "h-code-02",
+    "h-code-03",
+    "h-code-04",
+    "h-visualize-01"
+  ],
+  "rows": [
+    {
+      "id": "h-ingest-01",
+      "kind": "direct",
+      "query": "Set up a ditto reproduction of https://arxiv.org/abs/1409.0473",
+      "expect": [
+        "ingest"
+      ],
+      "got": "ingest",
+      "ok": true
+    },
+    {
+      "id": "h-ingest-02",
+      "kind": "indirect",
+      "query": "My advisor sent me this paper, arXiv 2103.00020 \u2014 I need to reimplement it from scratch",
+      "expect": [
+        "ingest",
+        "code"
+      ],
+      "got": "ingest",
+      "ok": true
+    },
+    {
+      "id": "h-ingest-03",
+      "kind": "indirect",
+      "query": "Pull down the BERT paper and get it ready for a reproduction attempt",
+      "expect": [
+        "ingest"
+      ],
+      "got": "error",
+      "ok": false
+    },
+    {
+      "id": "h-ingest-04",
+      "kind": "indirect",
+      "query": "Here's a local PDF of a NeurIPS paper \u2014 start the pipeline on it: ./papers/glow.pdf",
+      "expect": [
+        "ingest"
+      ],
+      "got": "ingest",
+      "ok": true
+    },
+    {
+      "id": "h-explain-01",
+      "kind": "direct",
+      "query": "Explain the ingested paper's method section in plain language",
+      "expect": [
+        "explain"
+      ],
+      "got": "explain",
+      "ok": true
+    },
+    {
+      "id": "h-explain-02",
+      "kind": "indirect",
+      "query": "The run for 1503.02531 is ingested \u2014 what is this paper actually doing?",
+      "expect": [
+        "explain"
+      ],
+      "got": "explain",
+      "ok": true
+    },
+    {
+      "id": "h-explain-03",
+      "kind": "indirect",
+      "query": "Turn the validated IR into a walkthrough I can read on the train",
+      "expect": [
+        "explain"
+      ],
+      "got": "explain",
+      "ok": true
+    },
+    {
+      "id": "h-explain-04",
+      "kind": "indirect",
+      "query": "Teach me the distillation paper we ingested, equations included",
+      "expect": [
+        "explain"
+      ],
+      "got": "explain",
+      "ok": true
+    },
+    {
+      "id": "h-code-01",
+      "kind": "direct",
+      "query": "Implement the ingested paper's method and verify tier T1",
+      "expect": [
+        "code"
+      ],
+      "got": "code",
+      "ok": true
+    },
+    {
+      "id": "h-code-02",
+      "kind": "indirect",
+      "query": "Build the model from the paper's IR and show a single-batch overfit",
+      "expect": [
+        "code"
+      ],
+      "got": "error",
+      "ok": false
+    },
+    {
+      "id": "h-code-03",
+      "kind": "indirect",
+      "query": "Check our reproduction code against the paper's equations for faithfulness",
+      "expect": [
+        "code"
+      ],
+      "got": "error",
+      "ok": false
+    },
+    {
+      "id": "h-code-04",
+      "kind": "indirect",
+      "query": "The grokking paper is ingested, now make the method actually run and learn",
+      "expect": [
+        "code"
+      ],
+      "got": "error",
+      "ok": false
+    },
+    {
+      "id": "h-visualize-01",
+      "kind": "direct",
+      "query": "Generate the architecture and training visualizations for the LoRA run",
+      "expect": [
+        "visualize"
+      ],
+      "got": "error",
+      "ok": false
+    },
+    {
+      "id": "h-visualize-02",
+      "kind": "indirect",
+      "query": "Plot what happened during training in the reproduction run's logs",
+      "expect": [
+        "visualize"
+      ],
+      "got": "visualize",
+      "ok": true
+    },
+    {
+      "id": "h-visualize-03",
+      "kind": "indirect",
+      "query": "I need a diagram of the ingested paper's model for the writeup",
+      "expect": [
+        "visualize"
+      ],
+      "got": "visualize",
+      "ok": true
+    },
+    {
+      "id": "h-visualize-04",
+      "kind": "indirect",
+      "query": "Render the attention maps from our transformer reproduction",
+      "expect": [
+        "visualize"
+      ],
+      "got": "visualize",
+      "ok": true
+    },
+    {
+      "id": "h-report-01",
+      "kind": "direct",
+      "query": "Produce the reproduction report for the DDPM run",
+      "expect": [
+        "report"
+      ],
+      "got": "report",
+      "ok": true
+    },
+    {
+      "id": "h-report-02",
+      "kind": "indirect",
+      "query": "So \u2014 did the reproduction actually work? Write it up honestly",
+      "expect": [
+        "report"
+      ],
+      "got": "report",
+      "ok": true
+    },
+    {
+      "id": "h-report-03",
+      "kind": "indirect",
+      "query": "Compare what the paper claimed against what our implementation achieved",
+      "expect": [
+        "report"
+      ],
+      "got": "report",
+      "ok": true
+    },
+    {
+      "id": "h-report-04",
+      "kind": "indirect",
+      "query": "Finish the run: verdict, tier reached, assumptions, deviations",
+      "expect": [
+        "report"
+      ],
+      "got": "report",
+      "ok": true
+    },
+    {
+      "id": "h-neg-01",
+      "kind": "negative",
+      "query": "Summarize chapter 3 of this textbook PDF",
+      "expect": [
+        "none"
+      ],
+      "got": "none",
+      "ok": true
+    },
+    {
+      "id": "h-neg-02",
+      "kind": "negative",
+      "query": "Reproduce this bug: clicking save crashes the app",
+      "expect": [
+        "none"
+      ],
+      "got": "run",
+      "ok": true
+    },
+    {
+      "id": "h-neg-03",
+      "kind": "negative",
+      "query": "Make a chart of my monthly expenses",
+      "expect": [
+        "none"
+      ],
+      "got": "none",
+      "ok": true
+    },
+    {
+      "id": "h-neg-04",
+      "kind": "negative",
+      "query": "Explain transformers to me like I'm five",
+      "expect": [
+        "none"
+      ],
+      "got": "none",
+      "ok": true
+    },
+    {
+      "id": "h-neg-05",
+      "kind": "negative",
+      "query": "Write documentation for my Python package",
+      "expect": [
+        "none"
+      ],
+      "got": "none",
+      "ok": true
+    },
+    {
+      "id": "h-neg-06",
+      "kind": "negative",
+      "query": "Help me respond to reviewer 2's comments on my paper submission",
+      "expect": [
+        "none"
+      ],
+      "got": "none",
+      "ok": true
+    }
+  ]
+}

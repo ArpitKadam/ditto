@@ -1,0 +1,268 @@
+# Trigger eval — development set (used during description optimization).
+# expect: list of acceptable skills, or [none] for negatives that must not
+# fire any ditto skill. Multiple entries when two routes are both correct
+# (e.g. "implement this arXiv paper" in a fresh session may open with ingest).
+# kind: direct | indirect | negative
+
+queries:
+  # ---- ingest ------------------------------------------------------------
+  - id: ingest-01
+    kind: direct
+    query: "Reproduce arXiv 2106.09685"
+    expect: [ingest]
+  - id: ingest-02
+    kind: direct
+    query: "Ingest this paper: https://arxiv.org/abs/2006.11239"
+    expect: [ingest]
+  - id: ingest-03
+    kind: indirect
+    query: "Can you implement this arXiv paper? https://arxiv.org/abs/1706.03762"
+    expect: [ingest, code]
+  - id: ingest-04
+    kind: indirect
+    query: "I want to understand and reproduce the DDPM paper, arXiv 2006.11239"
+    expect: [ingest]
+  - id: ingest-05
+    kind: indirect
+    query: "Here's a paper PDF at C:\\papers\\attention.pdf — set it up so we can reproduce it"
+    expect: [ingest]
+  - id: ingest-06
+    kind: direct
+    query: "Start a reproduction run for 1503.02531"
+    expect: [ingest]
+  - id: ingest-07
+    kind: indirect
+    query: "Fetch and analyze the LoRA paper from arXiv"
+    expect: [ingest]
+  - id: ingest-08
+    kind: indirect
+    query: "arxiv.org/abs/2010.11929 — what would it take to implement this?"
+    expect: [ingest, code]
+  - id: ingest-09
+    kind: direct
+    query: "Read this research paper and build the IR: arXiv 2205.14135"
+    expect: [ingest]
+  - id: ingest-10
+    kind: indirect
+    query: "I have a paper I want to work through: https://arxiv.org/pdf/1512.03385"
+    expect: [ingest]
+
+  # ---- explain -----------------------------------------------------------
+  - id: explain-01
+    kind: direct
+    query: "Explain the paper we ingested with ditto"
+    expect: [explain]
+  - id: explain-02
+    kind: indirect
+    query: "Walk me through the LoRA paper's method"
+    expect: [explain, ingest]
+  - id: explain-03
+    kind: direct
+    query: "Generate the explanation walkthrough for run 2106.09685"
+    expect: [explain]
+  - id: explain-04
+    kind: indirect
+    query: "The DDPM paper is already ingested — help me actually understand how the method works"
+    expect: [explain]
+  - id: explain-05
+    kind: direct
+    query: "Write explain.md for the DDPM run"
+    expect: [explain]
+  - id: explain-06
+    kind: indirect
+    query: "Summarize the ingested paper's training recipe and what's unknown about it"
+    expect: [explain]
+  - id: explain-07
+    kind: indirect
+    query: "What does equation 4 mean in the paper we ingested? Walk me through the math"
+    expect: [explain]
+  - id: explain-08
+    kind: indirect
+    query: "Give me a readable walkthrough of arXiv 1503.02531"
+    expect: [explain, ingest]
+  - id: explain-09
+    kind: indirect
+    query: "Break down the grokking paper for me — intuition first, then the method"
+    expect: [explain, ingest]
+  - id: explain-10
+    kind: indirect
+    query: "I need to present this ingested paper to my reading group tomorrow, help me understand it"
+    expect: [explain]
+
+  # ---- code --------------------------------------------------------------
+  - id: code-01
+    kind: direct
+    query: "Implement the method from the ingested LoRA paper"
+    expect: [code]
+  - id: code-02
+    kind: direct
+    query: "Code up the paper in run 2106.09685 to tier T1"
+    expect: [code]
+  - id: code-03
+    kind: indirect
+    query: "Train the method from the paper we ingested and show it learns"
+    expect: [code]
+  - id: code-04
+    kind: indirect
+    query: "The IR for the DDPM paper is validated — now build a working implementation"
+    expect: [code]
+  - id: code-05
+    kind: indirect
+    query: "How faithful is our implementation to the paper it reproduces?"
+    # Either route is correct: code's reviewer checks faithfulness,
+    # report delivers the claimed-vs-achieved verdict.
+    expect: [code, report]
+  - id: code-06
+    kind: direct
+    query: "Run ditto code on the grokking paper"
+    expect: [code]
+  - id: code-07
+    kind: indirect
+    query: "Write the PyTorch implementation for the ingested paper and overfit a single batch"
+    expect: [code]
+  - id: code-08
+    kind: indirect
+    query: "Get the LoRA reproduction to T2 — adapter should beat the frozen baseline"
+    expect: [code]
+  - id: code-09
+    kind: indirect
+    query: "Turn the equations in the ingested paper's IR into working modules"
+    expect: [code]
+  - id: code-10
+    kind: indirect
+    query: "Reproduce the paper's method in code — the ingest stage is already done"
+    expect: [code]
+
+  # ---- visualize ---------------------------------------------------------
+  - id: visualize-01
+    kind: direct
+    query: "Visualize the architecture of the ingested paper"
+    expect: [visualize]
+  - id: visualize-02
+    kind: direct
+    query: "Plot the training curves from the reproduction run"
+    expect: [visualize]
+  - id: visualize-03
+    kind: indirect
+    query: "Make an architecture diagram for the LoRA run"
+    expect: [visualize]
+  - id: visualize-04
+    kind: indirect
+    query: "Generate attention visualizations for the transformer paper we implemented"
+    expect: [visualize]
+  - id: visualize-05
+    kind: direct
+    query: "Run ditto visualize on run 2006.11239"
+    expect: [visualize]
+  - id: visualize-06
+    kind: indirect
+    query: "Show me the loss curves from the paper reproduction's training logs"
+    expect: [visualize]
+  - id: visualize-07
+    kind: indirect
+    query: "Diagram the layers of the model from the ingested paper"
+    expect: [visualize]
+  - id: visualize-08
+    kind: indirect
+    query: "The code stage finished — produce the standard plots for the run"
+    expect: [visualize]
+  - id: visualize-09
+    kind: indirect
+    query: "I want a figure of the ingested paper's architecture for my slides"
+    expect: [visualize]
+  - id: visualize-10
+    kind: indirect
+    query: "Chart how training went for the DDPM reproduction"
+    expect: [visualize]
+
+  # ---- report ------------------------------------------------------------
+  - id: report-01
+    kind: direct
+    query: "Write the reproduction report for LoRA"
+    expect: [report]
+  - id: report-02
+    kind: indirect
+    query: "Did we reproduce this paper? Give me the verdict"
+    expect: [report]
+  - id: report-03
+    kind: direct
+    query: "Claimed vs achieved for run 2106.09685, please"
+    expect: [report]
+  - id: report-04
+    kind: indirect
+    query: "How did the DDPM reproduction go overall?"
+    expect: [report]
+  - id: report-05
+    kind: direct
+    query: "Run ditto report on the grokking run"
+    expect: [report]
+  - id: report-06
+    kind: indirect
+    query: "Summarize the reproduction: what tier did we reach, what did we assume, what deviated?"
+    expect: [report]
+  - id: report-07
+    kind: indirect
+    query: "Write up whether our implementation matched the paper's headline numbers"
+    expect: [report]
+  - id: report-08
+    kind: indirect
+    query: "I need the final report for the paper reproduction we finished yesterday"
+    expect: [report]
+  - id: report-09
+    kind: indirect
+    query: "Which assumptions did we make in the LoRA reproduction and did they matter? Put it in the report"
+    expect: [report]
+  - id: report-10
+    kind: indirect
+    query: "Close out the reproduction run with its report"
+    expect: [report]
+
+  # ---- negatives (must fire NO ditto skill) ------------------------------
+  - id: neg-01
+    kind: negative
+    query: "Summarize this news article PDF for me"
+    expect: [none]
+  - id: neg-02
+    kind: negative
+    query: "Implement quicksort in Python"
+    expect: [none]
+  - id: neg-03
+    kind: negative
+    query: "Plot this CSV of sales data as a bar chart"
+    expect: [none]
+  - id: neg-04
+    kind: negative
+    query: "Explain how the auth flow in this codebase works"
+    expect: [none]
+  - id: neg-05
+    kind: negative
+    query: "Help me write a research paper about my experiment results"
+    expect: [none]
+  - id: neg-06
+    kind: negative
+    query: "Review my resume PDF and suggest improvements"
+    expect: [none]
+  - id: neg-07
+    kind: negative
+    query: "What's new in PyTorch 2.5?"
+    expect: [none]
+  - id: neg-08
+    kind: negative
+    query: "Fix the failing test in my repo"
+    expect: [none]
+  - id: neg-09
+    kind: negative
+    query: "Draw a system architecture diagram of my microservices"
+    expect: [none]
+  - id: neg-10
+    kind: negative
+    query: "Write a report on Q3 sales performance"
+    expect: [none]
+  - id: neg-11
+    kind: negative
+    query: "Train a quick sentiment classifier on this dataset"
+    expect: [none]
+  - id: neg-12
+    kind: negative
+    query: "Visualize my git history as a graph"
+    expect: [none]

@@ -1,0 +1,114 @@
+# Trigger eval — held-out set. Never inspected during description
+# optimization; run once against the final descriptions for the report.
+# Same schema as queries.yaml.
+
+queries:
+  - id: h-ingest-01
+    kind: direct
+    query: "Set up a ditto reproduction of https://arxiv.org/abs/1409.0473"
+    expect: [ingest]
+  - id: h-ingest-02
+    kind: indirect
+    query: "My advisor sent me this paper, arXiv 2103.00020 — I need to reimplement it from scratch"
+    expect: [ingest, code]
+  - id: h-ingest-03
+    kind: indirect
+    query: "Pull down the BERT paper and get it ready for a reproduction attempt"
+    expect: [ingest]
+  - id: h-ingest-04
+    kind: indirect
+    query: "Here's a local PDF of a NeurIPS paper — start the pipeline on it: ./papers/glow.pdf"
+    expect: [ingest]
+
+  - id: h-explain-01
+    kind: direct
+    query: "Explain the ingested paper's method section in plain language"
+    expect: [explain]
+  - id: h-explain-02
+    kind: indirect
+    query: "The run for 1503.02531 is ingested — what is this paper actually doing?"
+    expect: [explain]
+  - id: h-explain-03
+    kind: indirect
+    query: "Turn the validated IR into a walkthrough I can read on the train"
+    expect: [explain]
+  - id: h-explain-04
+    kind: indirect
+    query: "Teach me the distillation paper we ingested, equations included"
+    expect: [explain]
+
+  - id: h-code-01
+    kind: direct
+    query: "Implement the ingested paper's method and verify tier T1"
+    expect: [code]
+  - id: h-code-02
+    kind: indirect
+    query: "Build the model from the paper's IR and show a single-batch overfit"
+    expect: [code]
+  - id: h-code-03
+    kind: indirect
+    query: "Check our reproduction code against the paper's equations for faithfulness"
+    expect: [code]
+  - id: h-code-04
+    kind: indirect
+    query: "The grokking paper is ingested, now make the method actually run and learn"
+    expect: [code]
+
+  - id: h-visualize-01
+    kind: direct
+    query: "Generate the architecture and training visualizations for the LoRA run"
+    expect: [visualize]
+  - id: h-visualize-02
+    kind: indirect
+    query: "Plot what happened during training in the reproduction run's logs"
+    expect: [visualize]
+  - id: h-visualize-03
+    kind: indirect
+    query: "I need a diagram of the ingested paper's model for the writeup"
+    expect: [visualize]
+  - id: h-visualize-04
+    kind: indirect
+    query: "Render the attention maps from our transformer reproduction"
+    expect: [visualize]
+
+  - id: h-report-01
+    kind: direct
+    query: "Produce the reproduction report for the DDPM run"
+    expect: [report]
+  - id: h-report-02
+    kind: indirect
+    query: "So — did the reproduction actually work? Write it up honestly"
+    expect: [report]
+  - id: h-report-03
+    kind: indirect
+    query: "Compare what the paper claimed against what our implementation achieved"
+    expect: [report]
+  - id: h-report-04
+    kind: indirect
+    query: "Finish the run: verdict, tier reached, assumptions, deviations"
+    expect: [report]
+
+  - id: h-neg-01
+    kind: negative
+    query: "Summarize chapter 3 of this textbook PDF"
+    expect: [none]
+  - id: h-neg-02
+    kind: negative
+    query: "Reproduce this bug: clicking save crashes the app"
+    expect: [none]
+  - id: h-neg-03
+    kind: negative
+    query: "Make a chart of my monthly expenses"
+    expect: [none]
+  - id: h-neg-04
+    kind: negative
+    query: "Explain transformers to me like I'm five"
+    expect: [none]
+  - id: h-neg-05
+    kind: negative
+    query: "Write documentation for my Python package"
+    expect: [none]
+  - id: h-neg-06
+    kind: negative
+    query: "Help me respond to reviewer 2's comments on my paper submission"
+    expect: [none]

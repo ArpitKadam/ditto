@@ -271,7 +271,7 @@ Status values: `pending | in-progress | done`. Update in place as work progresse
 - **Accept:** Cold install → successful ingest of an unseen paper with zero path errors.
 - **Verify:** Clean-environment run logged.
 
-**Task 13 — Trigger evals + description optimization** · Status: pending
+**Task 13 — Trigger evals + description optimization** · Status: done
 - **Goal:** Skills fire when they should.
 - **Do:** Use the `skill-creator` tooling: build a trigger eval set (~15 queries per skill: direct asks, indirect phrasings like "can you implement this arXiv paper", and negatives that must NOT trigger, e.g. "summarize this news article PDF"). Run the description-optimization loop; adopt best descriptions; make them appropriately pushy ("use whenever the user mentions reproducing, implementing, or reading a research paper, shares an arXiv link…").
 - **Accept:** Trigger rate on held-out queries materially improved or confirmed high; negatives don't fire.
