@@ -209,7 +209,7 @@ Status values: `pending | in-progress | done`. Update in place as work progresse
 - **Accept:** For each test paper: every numbered equation present in `paper.md` as valid LaTeX; every architecture figure present in `figures/`; tables survive with structure (LaTeX/HTML source, not OCR soup).
 - **Verify:** pytest fixture assertions (equation count, figure count per paper); human spot-check of one figure and one equation per paper.
 
-**Task 4 — IR build + validate** · Status: pending
+**Task 4 — IR build + validate** · Status: done
 - **Goal:** `ir.yaml` scaffold, filled by Claude, mechanically validated.
 - **Do:** `ir_build.py` writes the skeleton (Contract 2) pre-filled with paper metadata + figure inventory. `ir_validate.py` enforces: schema shape; every leaf field carries `status`; every `stated`/`inferred` field carries a non-empty `src`; `implementation_notes.assumptions/unknowns` exactly mirror the fields tagged `assumed`/`unknown`; equations have parseable LaTeX. Exit non-zero with a findings list on violation.
 - **Accept:** Validator catches seeded violations (test cases for each rule); a hand-filled partial IR for one paper validates clean.

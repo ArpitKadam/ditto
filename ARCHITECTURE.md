@@ -29,17 +29,25 @@ ditto/
 │   ├── __init__.py
 │   ├── fetch.py                 # DONE: resolve input → download source (e-print / html / pdf / local)
 │   ├── extract.py               # DONE: source → paper.md + figures/ (+ pages/ for pdf)
-│   ├── ir_build.py              # stub: scaffold ir.yaml skeleton for Claude to fill
-│   ├── ir_validate.py           # stub: schema check + provenance lint + status coverage
+│   ├── ir_build.py              # DONE: scaffold ir.yaml skeleton for Claude to fill; --derive resync
+│   ├── ir_validate.py           # DONE: schema check + provenance lint + status coverage + mirror
 │   └── workspace.py             # DONE: run dir creation, manifest read/write
 ├── tests/                       # pytest; fixtures = the three test papers
 ├── pyproject.toml               # uv-managed, package = false, requires-python >=3.11.5
 └── runs/                        # gitignored; per-paper workspaces
 ```
 
-Pending (created by the task that first fills them): `skills/{ingest,explain,code,visualize,report}/`, `agents/{ir-auditor,implementation-reviewer,viz-reviewer}.md`, `templates/`.
+Pending (created by the task that first fills them): `skills/{ingest,explain,code,visualize,report}/`, `agents/{ir-auditor,implementation-reviewer,viz-reviewer}.md`, `templates/`. The IR skeleton is generated in code (`ir_build.skeleton`), not from a template file — same precedent as the manifest.
 
-`ir_build.py`, `ir_validate.py` are docstring-only stubs; Task 4 implements them.
+## IR build (`pipeline/ir_build.py`)
+
+`build_ir(run_dir)` (CLI: `python -m pipeline.ir_build <run_dir>`) writes `ir.yaml`: the Contract 2 skeleton pre-filled with paper metadata (`manifest.yaml` + `fetch_meta.yaml`: id, title, authors, year, source_kind, first `official_repo_candidates` entry as `official_repo` with status `stated`) and the figure inventory (top-level `figures:` from `figures/figures.yaml`, glob fallback for the PDF path). Every status-carrying leaf starts `status: unknown` and `implementation_notes.unknowns` is pre-derived, so a fresh skeleton validates clean. Refuses to overwrite an existing `ir.yaml` without `--force`. A static header comment (status legend, src format, validator rules) is prepended on every write.
+
+`--derive` resyncs `implementation_notes.assumptions/unknowns` from field statuses after Claude edits: assumptions keep hand-written `basis` text per field; unknowns become the exact list of `unknown`-tagged dotted paths. `status_fields(ir)` defines the status-leaf set once — `problem.statement/motivation`, `method.summary`, the ten `training.*` fields, `architecture.layers[]` items — and the validator imports it, so build and validate cannot drift.
+
+## IR validate (`pipeline/ir_validate.py`)
+
+`validate_run(run_dir)` / `validate_ir(ir, run_dir)` (CLI: `python -m pipeline.ir_validate <run_dir>`) is a pure read-only check returning a findings list (CLI: exit 0 clean, 1 with one finding per line, 2 operational error). Never rewrites the IR or manifest — manifest updates belong to the ingest skill. Rules: top-level sections present and no unknown extras; `paper.*` keys and `official_repo` shape; every status leaf is a mapping with status ∈ `stated | inferred | assumed | unknown`; `stated`/`inferred` require non-empty `src`; `method.components[]` require name + src; `mathematics.equations[]` require id, src, and parseable LaTeX (escape-aware brace balance + matched `\begin`/`\end` pairs — no LaTeX parser dep); `evaluation.headline_results[]` require src; `architecture.diagram` must be null or an existing file in the run dir; `implementation_notes.assumptions/unknowns` exactly mirror the `assumed`/`unknown`-tagged fields.
 
 ## Fetch pipeline (`pipeline/fetch.py`)
 
@@ -133,11 +141,16 @@ experiments:
   baselines: []
   ablations: []
 
+figures:             # inventory copied from figures/figures.yaml at build time
+  - {id: fig1, file: figures/fig1.pdf, caption: ""}
+
 implementation_notes:
-  assumptions: []   # auto-derived: every field with status assumed → {field, value, basis}
-  unknowns: []      # auto-derived: every field with status unknown
+  assumptions: []   # auto-derived (`ir_build --derive`): every field with status assumed → {field, value, basis}
+  unknowns: []      # auto-derived: every field with status unknown (dotted paths)
   deviations: []    # appended by ditto:code as they happen
 ```
+
+The `{value, status, src}` convention applies to value-bearing leaves (`problem.*`, `method.summary`, `training.*`, `architecture.layers[]`); `method.components[]` and `mathematics.equations[]` keep the shapes shown (src required, no status); `paper.official_repo` is shape-checked metadata outside the mirror (see the Task 4 decision).
 
 ## Contract 3 — Manifest schema
 
