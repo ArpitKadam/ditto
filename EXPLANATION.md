@@ -2,6 +2,17 @@
 
 Append-only log: what was built, how it works, how it was verified. One entry per completed task.
 
+## 2026-08-31 — Task 3: extract.py
+
+- **What changed:** Implemented `pipeline/extract.py` — `source/` → `paper.md` + `figures/` (+ `pages/` for PDF). Added PyMuPDF. Tests in `tests/test_extract.py` (offline unit + synthetic latex/pdf/html + network on the three papers).
+- **How it works:** `extract(run_dir)` dispatches on `manifest.yaml` `source_kind`. LaTeX path strips comments/preamble, preserves the body verbatim (equations, tables, inline math as LaTeX), rewrites each `\includegraphics` to a stable `figures/figN.<ext>` and copies the asset, and records provenance + caption in `figures/figures.yaml`. A depth-aware `brace_arg` handles nested paths (`\iftoggle{hq}{A}{B}`); `resolve_asset` picks the first on-disk candidate. PDF path (PyMuPDF) extracts text + embedded images + 150 dpi page renders; HTML path (stdlib `HTMLParser`) extracts text + `<img>` assets. Full mechanism in ARCHITECTURE.md → "Extract pipeline".
+- **How it was verified:**
+  - `uv run pytest -q` → **44 passed, 6 deselected** (offline; includes synthetic latex/pdf/html round-trips and the traversal-rejection test).
+  - `uv run pytest -q -m network` (extract) → **3 passed** — LoRA (4 eq, 8 fig), DDPM (16 eq, 18 fig), Grokking (0 eq, 11 fig).
+  - Human spot-check on persisted `runs/`: DDPM `paper.md` contains all 16 `\begin{align}` verbatim; `\includegraphics` rewritten to `figures/fig1.png`/`fig2.png`; `figures.yaml` records original path + caption; `paper.md` starts at the title (preamble/comments gone); paper.md sizes 30–95 KB.
+- **Security (Phase E):** Same untrusted-content boundary as Task 2. `_within()` blocks `../`/symlink escape so a crafted `\includegraphics{../../secret.png}` or HTML `<img src>` cannot copy files out of `source/`; regression test `test_resolve_asset_rejects_traversal`.
+- **Limitations / follow-ups:** `figures/figN` keeps the original extension — LoRA figures are `.pdf`, not raster; a skill needing a viewable diagram must rasterize on demand (Task 5/7 follow-up). The `caption` field in `figures.yaml` strips inline-math macros (`\times`) for readability — a convenience only; the faithful caption is verbatim in `paper.md`. HTML/PDF paths are unit-tested on synthetic inputs but not on a real paper (all three test papers are LaTeX). The `network` extract test re-fetches, so running the full `-m network` suite (6 arXiv hits) can rate-limit; space runs out if it flakes.
+
 ## 2026-08-31 — Task 2: fetch.py + workspace.py
 
 - **What changed:** Implemented `pipeline/workspace.py` (create run dir, build/read/write `manifest.yaml` per Contract 3) and `pipeline/fetch.py` (resolve any supported input → download source into `runs/<slug>/` → write manifest + `fetch_meta.yaml`). Added `PyYAML`. Added a `network` pytest marker, deselected by default. Tests: `tests/test_workspace.py`, `tests/test_fetch.py` (offline unit + network integration).

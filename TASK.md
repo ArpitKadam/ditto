@@ -203,7 +203,7 @@ Status values: `pending | in-progress | done`. Update in place as work progresse
 - **Accept:** All three test papers fetch via e-print with figures present in the tarball assets; a local-PDF fixture also produces a valid workspace; garbage input fails with an explicit error, not a stack trace.
 - **Verify:** pytest cases per input type (network tests marked, cassette/fixture-based where possible); manual run on all three papers.
 
-**Task 3 — `pipeline/extract.py`** · Status: pending
+**Task 3 — `pipeline/extract.py`** · Status: done
 - **Goal:** `source/` → `paper.md` + `figures/`.
 - **Do:** LaTeX path: strip preamble/comments, preserve math environments verbatim, resolve `\includegraphics` → copy assets to `figures/` with stable names, keep captions. HTML path: readable text + math (MathML/LaTeX annotations) + download figure assets. PDF path (last resort): PyMuPDF text + embedded-image extraction + full-page renders to `pages/` at ~150 dpi.
 - **Accept:** For each test paper: every numbered equation present in `paper.md` as valid LaTeX; every architecture figure present in `figures/`; tables survive with structure (LaTeX/HTML source, not OCR soup).

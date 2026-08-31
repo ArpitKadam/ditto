@@ -28,7 +28,7 @@ ditto/
 ├── pipeline/                    # plain Python package; skills invoke, never reimplement
 │   ├── __init__.py
 │   ├── fetch.py                 # DONE: resolve input → download source (e-print / html / pdf / local)
-│   ├── extract.py               # stub: source → paper.md + figures/ (+ pages/ for pdf)
+│   ├── extract.py               # DONE: source → paper.md + figures/ (+ pages/ for pdf)
 │   ├── ir_build.py              # stub: scaffold ir.yaml skeleton for Claude to fill
 │   ├── ir_validate.py           # stub: schema check + provenance lint + status coverage
 │   └── workspace.py             # DONE: run dir creation, manifest read/write
@@ -39,7 +39,7 @@ ditto/
 
 Pending (created by the task that first fills them): `skills/{ingest,explain,code,visualize,report}/`, `agents/{ir-auditor,implementation-reviewer,viz-reviewer}.md`, `templates/`.
 
-`extract.py`, `ir_build.py`, `ir_validate.py` are docstring-only stubs; Tasks 3–4 implement them.
+`ir_build.py`, `ir_validate.py` are docstring-only stubs; Task 4 implements them.
 
 ## Fetch pipeline (`pipeline/fetch.py`)
 
@@ -51,6 +51,16 @@ Pending (created by the task that first fills them): `skills/{ingest,explain,cod
 4. `workspace.new_manifest` + `write_manifest` record `source_kind` (`latex`/`html`/`pdf`) and the pending stage tracker.
 
 Trust-boundary invariants (all downloaded content is untrusted): LaTeX `\input`/`\include` cannot escape the source tree; XML with a DTD is refused; HTML image assets download only over `http(s)` from `arxiv.org`.
+
+## Extract pipeline (`pipeline/extract.py`)
+
+`extract(run_dir)` reads `manifest.yaml` `source_kind` (inferring from `source/` if absent) and dispatches:
+
+- **LaTeX** (`extract_latex`): `strip_comments` (drops `%`-to-EOL, keeps `\%`) → `document_body` (between `\begin{document}`/`\end{document}`) → `_rewrite_graphics`. Each `\includegraphics` is located, its `{...}` argument read with the depth-aware `brace_arg` (handles `\iftoggle{hq}{A}{B}` nesting), and `resolve_asset` picks the first candidate image file that exists under `source/`. Resolved assets are copied to `figures/figN.<ext>` (first-appearance order, deduped by original path) and the reference in `paper.md` is rewritten to `figures/figN.<ext>`. `paper.md` is the cleaned body with math/tables preserved verbatim as LaTeX. `figures/figures.yaml` records `{id, file, original, caption}` per figure (caption from the enclosing `figure`/`wrapfigure` env). `count_equations` counts numbered display-equation environments.
+- **PDF** (`extract_pdf`, last resort): PyMuPDF — text per page concatenated into `paper.md`, embedded images (deduped by xref) to `figures/figN.png`, full-page 150 dpi renders to `pages/pageNN.png`.
+- **HTML** (`extract_html`, fallback): stdlib `HTMLParser` extracts visible text (skips `script`/`style`/`head`) and copies referenced `<img>` assets already downloaded under `source/` to `figures/`.
+
+Trust boundary: `_within(source_dir, path)` blocks any `../`/symlink escape, so a crafted `\includegraphics`/`<img src>` cannot copy files from outside `source/`. Returns `{source_kind, equations, figures}`.
 
 ## Contract 1 — Run workspace
 

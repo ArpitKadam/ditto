@@ -2,6 +2,13 @@
 
 Append-only log of significant technical decisions, newest first.
 
+## 2026-08-31 — Task 3: extraction is LaTeX-preserving, not detex'd
+
+- **Decision:** `paper.md` keeps the LaTeX document body verbatim — comments and preamble stripped, but math environments, tables, and inline math left as LaTeX source. No conversion to prose/plain text. `\includegraphics` targets are rewritten to stable `figures/figN.<ext>` names (original extension kept, no rasterization), the asset copied, and provenance + a best-effort caption recorded in `figures/figures.yaml`. Parsing is regex + a depth-aware brace matcher, no LaTeX-parser dependency. PDF path uses the already-locked PyMuPDF; HTML path uses stdlib `html.parser`.
+- **Alternatives considered:** (a) `pylatexenc`/full detex to prose — lossy for equations and adds a dep; the IR is an index that zooms back into `source/`, so fidelity beats readability here. (b) `pandoc` — heavy external binary. (c) Rasterizing PDF/EPS figures to PNG now — needs a renderer per figure and is only required when a skill must *view* a diagram (Task 5/7), so deferred. (d) `beautifulsoup4` for HTML — a dep the stdlib parser makes unnecessary for the fallback path.
+- **Why:** Ponytail ladder — the acceptance criteria (equations present as valid LaTeX, figures copied, tables survive as LaTeX) are met by a preserve-and-rewrite pass without a parser dependency. Verified on all three papers.
+- **Consequences:** `figures/figN` keeps mixed extensions (LoRA figures are `.pdf`). A skill that needs a raster diagram must rasterize on demand — tracked as a Task 5/7 follow-up. Caption cleanup strips inline-math macros (`\times` → gone) in the *convenience* `caption` field only; the faithful caption remains verbatim in `paper.md`. Same trust-boundary containment as Task 2 applies: `_within()` blocks `../` asset traversal out of `source/`.
+
 ## 2026-08-31 — Task 2: fetch implementation choices
 
 - **Decision:** (a) Use stdlib `urllib` for the three arXiv endpoints (e-print, export API, /html) instead of the `arxiv` package or `requests`. (b) Flatten multi-file LaTeX with a small in-repo Python `\input`/`\include` resolver instead of `latexpand`. (c) Slug = bare arXiv id with `/` → `-` (old-style ids), or sanitized filename stem for local/PDF-URL inputs. (d) Network tests carry a `network` pytest marker and are deselected by default (`addopts = -m 'not network'`); run explicitly with `-m network`.
