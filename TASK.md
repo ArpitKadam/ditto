@@ -243,7 +243,7 @@ Status values: `pending | in-progress | done`. Update in place as work progresse
 - **Accept:** Reviewer run on Task 7's output produces a findings list; seeded bug (wrong sign in loss) is caught in a test run.
 - **Verify:** Seeded-bug test documented in `EXPLANATION.md`.
 
-**Task 9 — End-to-end reproduction, papers 1–3** · Status: pending
+**Task 9 — End-to-end reproduction, papers 1–3** · Status: done
 - **Goal:** Prove the pipeline on real targets.
 - **Do:** Full `ingest → code` runs: LoRA to **T2** (small model, e.g. distilgpt2-scale, adapter beats frozen baseline directionally), DDPM to **T1** (single-batch overfit, MNIST-scale samples as bonus), paper 3 to **T1**. Where compute in the session is insufficient, produce the runnable script + config and have the user execute; results fed back.
 - **Accept:** `tier_reached` recorded honestly in each manifest with evidence in `impl/logs/`; deviations lists non-empty only where real; reviewer findings addressed.
