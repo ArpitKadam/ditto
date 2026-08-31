@@ -2,6 +2,12 @@
 
 Append-only log: what was built, how it works, how it was verified. One entry per completed task.
 
+## 2026-08-31 — Follow-up: GitHub marketplace install route verified (closes Task 12 limitation)
+
+- **What changed:** Nothing in the repo — this entry records the post-push verification of the one untested install path. `claude plugin marketplace add ArpitKadam/ditto` cloned and validated the marketplace; `claude plugin install ditto@ditto` installed to `~/.claude/plugins/cache/ditto/ditto/0.1.0/` (user scope); `claude plugin details ditto` lists all 5 skills + 3 agents (~499 tok always-on).
+- **How it was verified:** Full `ditto:ingest` of arXiv 1503.02531 in a headless session from a fresh empty directory **without `--plugin-dir`** — the installed copy served the skill. Checked from artifacts, not the session's claim: fresh `.venv` materialized inside the versioned install dir (proves `${CLAUDE_PLUGIN_ROOT}` + `uv run --directory` resolve at the real install path); complete run workspace (`paper.md` 34,717 B — byte-identical size to the Task 12 cleanroom run, `ir.yaml` with all 5 equations, manifest `ingest: done`, `ir: {done, validated: true}`); independent `ir_validate` re-run from the installed copy exit 0; `ir-auditor` verdict CLEAN, all sampled claims SUPPORTED.
+- **Limitations / follow-ups:** None — both install routes (session-scoped `--plugin-dir` and durable marketplace install) are now verified end-to-end.
+
 ## 2026-08-31 — Task 13: trigger evals + description optimization — 20/20 held-out, negatives clean
 
 - **What changed:** Four skill descriptions rewritten (`explain`, `code`, `visualize`, `report` — `ingest` was already at 10/10 and stayed untouched): broader verb coverage, each skill's own "ditto X" invocation phrase, and the key routing instruction "do not skip because no run is visible in the current directory — the skill locates the run workspace from the manifest and reports cleanly if missing", plus a scope guard on `explain` (not for codebases/source code/general concepts). New `tests/trigger_eval/`: probe harness (`run_trigger_eval.py`), dev set (`queries.yaml`, 50 positives + 12 negatives), held-out set (`holdout.yaml`, 20 + 6), eval report (`report.md`), raw per-query results (`results/*.json`). No pipeline, agent, or skill-body changes.
