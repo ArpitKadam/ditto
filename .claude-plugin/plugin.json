@@ -1,5 +1,19 @@
 {
   "name": "ditto",
   "version": "0.1.0",
-  "description": "Turn a research paper into an explained, implemented, visualized, and reported reproduction."
+  "description": "Turn a research paper into an explained, implemented, visualized, and reported reproduction.",
+  "author": {
+    "name": "Arpit Kadam",
+    "url": "https://github.com/ArpitKadam"
+  },
+  "homepage": "https://github.com/ArpitKadam/ditto",
+  "repository": "https://github.com/ArpitKadam/ditto",
+  "license": "Apache-2.0",
+  "keywords": [
+    "research-papers",
+    "arxiv",
+    "reproduction",
+    "paper-implementation",
+    "pytorch"
+  ]
 }

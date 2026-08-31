@@ -265,7 +265,7 @@ Status values: `pending | in-progress | done`. Update in place as work progresse
 
 ### Phase 5 — Package and evaluate
 
-**Task 12 — Plugin packaging + install test** · Status: pending
+**Task 12 — Plugin packaging + install test** · Status: done
 - **Goal:** Installable, namespaced, documented.
 - **Do:** Finalize `plugin.json` (name, version, skill/agent registration); README with quickstart; verify `${CLAUDE_PLUGIN_ROOT}` paths resolve; install into a clean Claude Code environment and run `ditto:ingest` on a fresh arXiv ID.
 - **Accept:** Cold install → successful ingest of an unseen paper with zero path errors.

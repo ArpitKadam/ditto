@@ -1,0 +1,15 @@
+{
+  "name": "ditto",
+  "description": "Marketplace for the ditto plugin: research-paper reproduction skills for Claude Code.",
+  "owner": {
+    "name": "Arpit Kadam",
+    "url": "https://github.com/ArpitKadam"
+  },
+  "plugins": [
+    {
+      "name": "ditto",
+      "source": ".",
+      "description": "Turn a research paper into an explained, implemented, visualized, and reported reproduction."
+    }
+  ]
+}

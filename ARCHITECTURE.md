@@ -24,7 +24,9 @@ Built so far (Task 1):
 
 ```text
 ditto/
-├── .claude-plugin/plugin.json   # plugin manifest
+├── .claude-plugin/
+│   ├── plugin.json              # plugin manifest (metadata-only; skills/ and agents/ auto-discovered)
+│   └── marketplace.json         # self-listing marketplace → repo installable via /plugin marketplace add
 ├── skills/
 │   ├── ingest/SKILL.md          # DONE: paper → validated IR (resumable; reads manifest, skips done stages)
 │   ├── explain/                 # DONE: IR → explain.md walkthrough (+ references/explanation-template.md)
@@ -54,6 +56,10 @@ All five skills and three agents are built. The IR skeleton is generated in code
 
 **Environment note:** `torch`/`torchvision` are CUDA builds (cu132) installed with `uv pip install --index-url https://download.pytorch.org/whl/cu132`, deliberately unmanaged by `pyproject.toml`/`uv.lock` (see the Task 7 decision) — fresh clones re-run that command.
 
+## Packaging and install (Task 12)
+
+The repo root **is** the plugin root: `.claude-plugin/plugin.json` is metadata-only (name `ditto`, version, author, license, keywords) because Claude Code auto-discovers `skills/<name>/SKILL.md` (namespaced `ditto:<name>`) and `agents/*.md` (namespaced `ditto:<agent>`) from their default locations. `.claude-plugin/marketplace.json` lists the repo as its own single-plugin marketplace (`source: "."`), so the durable install path is `/plugin marketplace add ArpitKadam/ditto` → `/plugin install ditto@ditto`; the session-scoped path is `claude --plugin-dir <checkout>`. Both manifests pass `claude plugin validate` (the CLAUDE.md-at-root warning is the accepted dev-contract exception). `${CLAUDE_PLUGIN_ROOT}` in skill bodies resolves to the installed plugin directory; the plugin's own `uv` environment materializes there on first `uv run` (core deps from `uv.lock`; torch stays a manual, hardware-specific `uv pip install` documented in README.md). Run workspaces always land in `runs/` under the **user's** project directory, never under the plugin root.
+
 ## Code skill (`skills/code/SKILL.md`)
 
 `ditto:code` turns a validated IR into `runs/<slug>/impl/`: workflow = official-repo check (record-only) → declare `tier_target` in the manifest → implementation plan mapping components/equations to modules → smallest-first implementation with `config_paper.yaml` (faithful, src comments, RESOLVED markers) + `config_small.yaml` (minutes on CPU) → deviations appended to `implementation_notes.deviations` (`{what, why, ir_field}`) at the moment they happen, IR re-validated → tier evidence saved to `impl/logs/` per `references/tiers.md` (T0 `t0_smoke.txt`, T1 overfit CSV+curve, T2 trend dir, T3 comparison table; evidence headers name command+seed) → manifest `tier_reached` never exceeds the evidence. `references/implementation-patterns.md` fixes the IR→module mapping discipline and assumed/unknown resolution protocol; `references/pytorch-patterns.md` fixes seeding, symbolic-dim shape assertions, frozen-gradient tests, and config-driven device choice.
@@ -76,7 +82,7 @@ All five skills and three agents are built. The IR skeleton is generated in code
 
 ## Ingest skill (`skills/ingest/SKILL.md`) + auditor (`agents/ir-auditor.md`)
 
-`ditto:ingest` is resumable by contract: every step reads `manifest.yaml` / workspace state and skips what is already done. Workflow: fetch → extract → `ir_build` scaffold → **fill** (Claude judgment: statuses never upgraded, `src` mandatory for stated/inferred, viewing the architecture diagram mandatory when present, equation LaTeX verbatim) → `ir_build --derive` → `ir_validate` until clean → spawn `ir-auditor` → save its report to `ir_audit.md` (zero tolerance for UNSUPPORTED/CONTRADICTED) → `workspace mark` sets `ingest: done`, `ir: {done, validated: true}`. Pipeline commands use `uv run --directory "${CLAUDE_PLUGIN_ROOT}" python -m pipeline.<module> …` with absolute run paths (clean-install verification is Task 12).
+`ditto:ingest` is resumable by contract: every step reads `manifest.yaml` / workspace state and skips what is already done. Workflow: fetch → extract → `ir_build` scaffold → **fill** (Claude judgment: statuses never upgraded, `src` mandatory for stated/inferred, viewing the architecture diagram mandatory when present, equation LaTeX verbatim) → `ir_build --derive` → `ir_validate` until clean → spawn `ir-auditor` → save its report to `ir_audit.md` (zero tolerance for UNSUPPORTED/CONTRADICTED) → `workspace mark` sets `ingest: done`, `ir: {done, validated: true}`. Pipeline commands use `uv run --directory "${CLAUDE_PLUGIN_ROOT}" python -m pipeline.<module> …` with absolute run paths (verified in the Task 12 clean-install run).
 
 `ir-auditor` is a fresh-context, read-only agent (Read/Grep/Glob): samples 10 `stated`/`inferred` claims (always ≥1 equation, headline result, diagram pointer when present), resolves each `src` against `paper.md`/`source/`, verdicts SUPPORTED / UNSUPPORTED / CONTRADICTED with quoted evidence; unfindable src = UNSUPPORTED, paraphrased equation = CONTRADICTED.
 
