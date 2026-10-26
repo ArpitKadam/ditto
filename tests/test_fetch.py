@@ -109,6 +109,11 @@ def test_flatten_resolves_nested_inputs(tmp_path):
         "C:\\Windows\\win.ini",
         "\\\\server\\share\\x",
         "//server/share/x",
+        "/\\server\\share\\x",
+        "\\/server/share/x",
+        "C:win.ini",
+        "\\\\?\\C:\\Windows\\win.ini",
+        "\\rooted\\x",
     ],
 )
 def test_flatten_rejects_out_of_tree_input(tmp_path, payload):
@@ -229,3 +234,23 @@ def test_fetch_test_papers_eprint(tmp_path, arxiv_id):
     assert assets, "expected figure assets in the e-print tarball"
     meta = (run_dir / "fetch_meta.yaml").read_text(encoding="utf-8")
     assert "title" in meta
+
+
+@pytest.mark.parametrize(
+    "name,expected",
+    [
+        ("C:/x", True),
+        ("C:x", True),
+        (r"\\srv\sh", True),
+        (r"/\srv\sh", True),
+        (r"\\?\C:\x", True),
+        ("/etc/passwd", True),
+        ("sections/deep", False),
+        ("a.b/c", False),
+        (r"..\up", False),
+    ],
+)
+def test_is_foreign_absolute_is_host_independent(name, expected):
+    from pipeline.fetch import _is_foreign_absolute
+
+    assert _is_foreign_absolute(name) is expected

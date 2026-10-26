@@ -5,7 +5,7 @@ Append-only log: what was built, how it works, how it was verified. One entry pe
 ## 2026-10-26 — Fix: Windows-path rejection test failing on Linux (issue #1)
 
 - **What changed:** `pipeline/fetch.py` now rejects Windows-absolute `\input` paths (drive letter, UNC) by shape on every platform; `tests/test_fetch.py` gains backslash-drive and both UNC cases.
-- **How it works:** `_WINDOWS_ABS_RE` is matched against the `\input` name in `flatten_latex` before `root / name`. On POSIX `C:/Windows/win.ini` is a relative in-tree name, so the containment check never fired and the result was `missing` instead of `rejected out-of-tree`.
+- **How it works:** `_is_foreign_absolute` (drive, root, or UNC prefix under `PureWindowsPath`, or absolute under `PurePosixPath`) is checked on the `\input` name in `flatten_latex` before `root / name` or any `resolve()`. A first regex version missed mixed separators (`/\host`), drive-relative `C:x` and `\\?\` forms; flagged by security review and replaced. On POSIX `C:/Windows/win.ini` is a relative in-tree name, so the containment check never fired and the result was `missing` instead of `rejected out-of-tree`.
 - **How it was verified:** `python -m pytest tests -q -m 'not network'` on Windows -> 95 passed, 6 deselected. Regex checked directly against drive, UNC, `//host`, and benign relative names. The original Linux failure is not reproducible on this Windows host; the fix removes the dependence on the host `Path` class.
 - **Limitations / follow-ups:** Not run on Linux here; the reporter's `pytest` run on Linux/3.12 should now pass.
 

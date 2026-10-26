@@ -5,7 +5,7 @@ Append-only log of significant technical decisions, newest first.
 ## 2026-10-26 — Issue #1: Windows-absolute `\input` rejected on every platform
 
 - **Decision:** `flatten_latex` rejects Windows-absolute `\input`/`\include` targets (drive letter `C:/` or `C:\`, UNC `\\host\share` or `//host/path`) by shape, before joining to the source root, on all platforms.
-- **Alternatives considered:** Make the test Windows-only (leaves POSIX CI silently treating `C:/x` as an in-tree name, so the guard's behavior differs by host).
+- **Alternatives considered:** A separator-shape regex (first attempt; missed `/\host`, `C:x`, `\\?\` and so was bypassable, see security review of a11f56a), replaced by `PureWindowsPath`/`PurePosixPath` drive/root checks, which are host-independent. Make the test Windows-only (leaves POSIX CI silently treating `C:/x` as an in-tree name, so the guard's behavior differs by host).
 - **Why:** Untrusted e-print input should be rejected identically wherever the pipeline runs; a platform-neutral guard keeps the platform-neutral test honest. On POSIX the containment check alone cannot see these as absolute.
 - **Consequences:** A legitimate in-tree file literally named like `C:/x` is rejected (not realistic in LaTeX sources). Revisit if a paper needs it.
 
