@@ -100,7 +100,17 @@ def test_flatten_resolves_nested_inputs(tmp_path):
     assert "\\input{" not in flat
 
 
-@pytest.mark.parametrize("payload", ["/etc/passwd", "../../../../secret", "C:/Windows/win.ini"])
+@pytest.mark.parametrize(
+    "payload",
+    [
+        "/etc/passwd",
+        "../../../../secret",
+        "C:/Windows/win.ini",
+        "C:\\Windows\\win.ini",
+        "\\\\server\\share\\x",
+        "//server/share/x",
+    ],
+)
 def test_flatten_rejects_out_of_tree_input(tmp_path, payload):
     outside = tmp_path.parent / "secret.tex"
     outside.write_text("TOPSECRET")

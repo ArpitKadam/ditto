@@ -33,6 +33,10 @@ _ARXIV_PATH_RE = re.compile(
 )
 _REPO_RE = re.compile(r"https?://(?:github|gitlab)\.com/[\w.-]+/[\w.-]+", re.I)
 _INPUT_RE = re.compile(r"\\(?:input|include)\{([^}]+)\}")
+# Windows-absolute shapes: drive-letter (C:/x or C:\x) and UNC (\\s\sh or //h/p).
+# These are absolute on Windows but plain relative names on POSIX, where the
+# containment check in flatten_latex would otherwise miss them.
+_WINDOWS_ABS_RE = re.compile(r"(?i)^(?:[a-z]:[\\/]|\\\\|//)")
 
 LOCAL_KINDS = {".pdf": "pdf", ".tex": "latex", ".txt": "latex"}
 
@@ -141,6 +145,12 @@ def flatten_latex(
 
     def repl(m: re.Match) -> str:
         name = m.group(1).strip()
+        # A Windows-absolute input (drive letter, or \\server\share / //host/path
+        # UNC) is absolute only on Windows; on POSIX `root / name` treats it as
+        # a relative in-tree name, so the containment check below would let it
+        # through instead of rejecting it. Detect it by shape, before joining.
+        if _WINDOWS_ABS_RE.match(name):
+            return f"% ditto: rejected out-of-tree {m.group(0)}"
         target = root / name
         if target.suffix == "":
             target = target.with_suffix(".tex")
